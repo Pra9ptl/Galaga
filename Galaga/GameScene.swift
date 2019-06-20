@@ -15,6 +15,21 @@ class GameScene: SKScene {
     let background = SKSpriteNode(imageNamed: "background")
     let background2 = SKSpriteNode(imageNamed: "background")
     
+    // Enemy 1
+    var ufos:[SKSpriteNode] = []
+    func makeUfo() {
+        // lets add some cats
+        let ufo = SKSpriteNode(imageNamed: "ufo")
+        
+        ufo.position = CGPoint(x:0, y:self.size.height + 100)
+        
+        // add the cat to the scene
+        addChild(ufo)
+        
+        // add the cat to the cats array
+        self.ufos.append(ufo)
+    }
+    
     //creating long background
     func createBackground(){
         backgroundColor = SKColor.white
@@ -51,10 +66,53 @@ class GameScene: SKScene {
     }
     override func didMove(to view: SKView) {
         self.createBackground()
+        
+        // set initial position of the UFO
+        for i in 0...3 {
+            makeUfo()
+        }
+    
+    }
+    
+    // variable to keep track of how much time has passed
+    var timeOfLastUpdate:TimeInterval?
+    // variable to keep track of how many ufo are there on screen
+    var trackUfoCount = 0
+    // variable to keep the x position of the last ufo
+    var ufoInitialPosition:CGFloat = 200
+    
+    func makeUfoAppear() {
+        
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 5)
+        let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition, y: self.size.height * 0.9), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m1, m2])
+        
+        if (trackUfoCount <= 3){
+            print("You Can Move \(trackUfoCount)")
+            ufos[trackUfoCount].run(sequence)
+            trackUfoCount += 1
+        }
+        
+        ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         self.moveBackground()
+        
+        if (timeOfLastUpdate == nil) {
+            timeOfLastUpdate = currentTime
+        }
+        // print a message every 3 seconds
+        var timePassed = (currentTime - timeOfLastUpdate!)
+        if (timePassed >= 2) {
+            timeOfLastUpdate = currentTime
+            
+            // Make Ufo Appear on screen
+            makeUfoAppear()
+            
+        }
+        
+        
     }
 }

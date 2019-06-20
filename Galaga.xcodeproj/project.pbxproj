@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4548EB3E22BB99B2009F9DD5 /* Ufo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4548EB3D22BB99B1009F9DD5 /* Ufo.swift */; };
 		45B5D39022BA6126007E2F73 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B5D38F22BA6126007E2F73 /* AppDelegate.swift */; };
 		45B5D39222BA6126007E2F73 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45B5D39122BA6126007E2F73 /* GameScene.sks */; };
 		45B5D39422BA6126007E2F73 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45B5D39322BA6126007E2F73 /* Actions.sks */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4548EB3D22BB99B1009F9DD5 /* Ufo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ufo.swift; sourceTree = "<group>"; };
 		45B5D38C22BA6126007E2F73 /* Galaga.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Galaga.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B5D38F22BA6126007E2F73 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		45B5D39122BA6126007E2F73 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				45B5D39C22BA612A007E2F73 /* Assets.xcassets */,
 				45B5D39E22BA612A007E2F73 /* LaunchScreen.storyboard */,
 				45B5D3A122BA612A007E2F73 /* Info.plist */,
+				4548EB3D22BB99B1009F9DD5 /* Ufo.swift */,
 			);
 			path = Galaga;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 			files = (
 				45B5D39622BA6126007E2F73 /* GameScene.swift in Sources */,
 				45B5D39822BA6126007E2F73 /* GameViewController.swift in Sources */,
+				4548EB3E22BB99B2009F9DD5 /* Ufo.swift in Sources */,
 				45B5D39022BA6126007E2F73 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
