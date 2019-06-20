@@ -17,6 +17,7 @@ class GameScene: SKScene {
     
     // Enemy 1
     var ufos:[SKSpriteNode] = []
+    var aircrafts:[SKSpriteNode] = []
     func makeUfo() {
         // lets add some cats
         let ufo = SKSpriteNode(imageNamed: "ufo")
@@ -28,6 +29,18 @@ class GameScene: SKScene {
         
         // add the cat to the cats array
         self.ufos.append(ufo)
+    }
+    func makeAirCraft() {
+        // lets add some cats
+        let airCraft = SKSpriteNode(imageNamed: "aircraft")
+        
+        airCraft.position = CGPoint(x:self.size.width, y:self.size.height + 100)
+        
+        // add the cat to the scene
+        addChild(airCraft)
+        
+        // add the cat to the cats array
+        self.aircrafts.append(airCraft)
     }
     
     //creating long background
@@ -68,8 +81,12 @@ class GameScene: SKScene {
         self.createBackground()
         
         // set initial position of the UFO
-        for i in 0...3 {
+        for _ in 0...3 {
             makeUfo()
+        }
+        
+        for _ in 0...5 {
+            makeAirCraft()
         }
     
     }
@@ -80,6 +97,10 @@ class GameScene: SKScene {
     var trackUfoCount = 0
     // variable to keep the x position of the last ufo
     var ufoInitialPosition:CGFloat = 200
+    // variable to keep track of how many ufo are there on screen
+    var trackAirCraftCount = 0
+    // variable to keep the x position of the last ufo
+    var airCraftInitialPosition:CGFloat = 150
     
     func makeUfoAppear() {
         
@@ -96,6 +117,21 @@ class GameScene: SKScene {
         ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
     }
     
+    func makeAirCraftAppear() {
+        
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 5)
+        let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition, y: self.size.height * 0.8), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m1, m2])
+        
+        if (trackAirCraftCount <= 5){
+            print("You Can Move \(trackAirCraftCount)")
+            aircrafts[trackAirCraftCount].run(sequence)
+            trackAirCraftCount += 1
+        }
+        
+        airCraftInitialPosition = airCraftInitialPosition + aircrafts[trackAirCraftCount-1].size.width
+    }
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         self.moveBackground()
@@ -110,6 +146,7 @@ class GameScene: SKScene {
             
             // Make Ufo Appear on screen
             makeUfoAppear()
+            makeAirCraftAppear()
             
         }
         
