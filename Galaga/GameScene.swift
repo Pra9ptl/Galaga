@@ -14,10 +14,13 @@ class GameScene: SKScene {
     // Variables for images
     let background = SKSpriteNode(imageNamed: "background")
     let background2 = SKSpriteNode(imageNamed: "background")
-    
-    // Enemy 1
+    var player = SKSpriteNode(imageNamed: "jet")
+    // Enemy
     var ufos:[SKSpriteNode] = []
     var aircrafts:[SKSpriteNode] = []
+    var shuttles:[SKSpriteNode] = []
+    
+    // Generating UFO
     func makeUfo() {
         // lets add some cats
         let ufo = SKSpriteNode(imageNamed: "ufo")
@@ -30,6 +33,8 @@ class GameScene: SKScene {
         // add the cat to the cats array
         self.ufos.append(ufo)
     }
+    
+    // Generting AirCraft
     func makeAirCraft() {
         // lets add some cats
         let airCraft = SKSpriteNode(imageNamed: "aircraft")
@@ -41,6 +46,20 @@ class GameScene: SKScene {
         
         // add the cat to the cats array
         self.aircrafts.append(airCraft)
+    }
+    
+    // Generting Shuttles
+    func makeShuttle() {
+        // lets add some cats
+        let shuttle = SKSpriteNode(imageNamed: "shuttle")
+        
+        shuttle.position = CGPoint(x:(self.size.width / 2), y:self.size.height + 100)
+        
+        // add the cat to the scene
+        addChild(shuttle)
+        
+        // add the cat to the cats array
+        self.shuttles.append(shuttle)
     }
     
     //creating long background
@@ -80,13 +99,24 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         self.createBackground()
         
-        // set initial position of the UFO
+        // Create player
+        self.player.position = CGPoint(x: 0, y: 100)
+        self.player.anchorPoint = CGPoint(x: 0, y: 0)
+        addChild(self.player)
+        
+        // drawing UFO
         for _ in 0...3 {
             makeUfo()
         }
         
+        // drawing AirCraft
         for _ in 0...5 {
             makeAirCraft()
+        }
+        
+        // draw shuttle
+        for _ in 0...9 {
+            makeShuttle()
         }
     
     }
@@ -96,15 +126,19 @@ class GameScene: SKScene {
     // variable to keep track of how many ufo are there on screen
     var trackUfoCount = 0
     // variable to keep the x position of the last ufo
-    var ufoInitialPosition:CGFloat = 200
-    // variable to keep track of how many ufo are there on screen
+    var ufoInitialPosition:CGFloat = 300
+    // variable to keep track of how many aircraft are there on screen
     var trackAirCraftCount = 0
-    // variable to keep the x position of the last ufo
-    var airCraftInitialPosition:CGFloat = 150
+    // variable to keep the x position of the last aircraft
+    var airCraftInitialPosition:CGFloat = 225
+    // variable to keep track of how many shuttle are there on screen
+    var trackShuttleCount = 0
+    // variable to keep the x position of the last shuttle
+    var shuttleInitialPosition:CGFloat = 100
     
     func makeUfoAppear() {
         
-        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 5)
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition, y: self.size.height * 0.9), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
@@ -119,7 +153,7 @@ class GameScene: SKScene {
     
     func makeAirCraftAppear() {
         
-        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 5)
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition, y: self.size.height * 0.8), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
@@ -132,24 +166,62 @@ class GameScene: SKScene {
         airCraftInitialPosition = airCraftInitialPosition + aircrafts[trackAirCraftCount-1].size.width
     }
     
+    func makeShuttleAppear() {
+        
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
+        let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition, y: self.size.height * 0.7), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m1, m2])
+        
+        if (trackShuttleCount <= 9){
+            print("You Can Move \(trackShuttleCount)")
+            shuttles[trackShuttleCount].run(sequence)
+            trackShuttleCount += 1
+        }
+        
+        shuttleInitialPosition = shuttleInitialPosition + shuttles[trackShuttleCount-1].size.width
+    }
+    
+    var isMovingRight = true
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         self.moveBackground()
+//        let m1 = SKAction.move(to: CGPoint(x: 0, y: player.position.y), duration: 2)
+//        let m3 = SKAction.move(to: CGPoint(x: (self.size.width - self.player.size.width), y: self.player.position.y), duration: 2)
+//
+        if(isMovingRight == true){
+            self.player.position.x += 20
+        } else if(isMovingRight == false){
+            self.player.position.x -= 20
+        }
         
+        if(self.player.position.x >= (self.size.width - self.player.size.width)){
+            isMovingRight = false
+        } else if(self.player.position.x <= 0) {
+            isMovingRight = true
+        }
+        
+        
+        //self.movePlayer()
         if (timeOfLastUpdate == nil) {
             timeOfLastUpdate = currentTime
         }
         // print a message every 3 seconds
-        var timePassed = (currentTime - timeOfLastUpdate!)
+        let timePassed = (currentTime - timeOfLastUpdate!)
         if (timePassed >= 2) {
             timeOfLastUpdate = currentTime
             
             // Make Ufo Appear on screen
             makeUfoAppear()
+            // Make airCraft Appear on screen
             makeAirCraftAppear()
-            
+            // Make Shuttle Appear on screen
+            makeShuttleAppear()
         }
         
         
+        
     }
+    
+    
 }
