@@ -183,12 +183,7 @@ class GameScene: SKScene {
     
     var isMovingRight = true
     
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-        self.moveBackground()
-//        let m1 = SKAction.move(to: CGPoint(x: 0, y: player.position.y), duration: 2)
-//        let m3 = SKAction.move(to: CGPoint(x: (self.size.width - self.player.size.width), y: self.player.position.y), duration: 2)
-//
+    func makePlayerMove() {
         if(isMovingRight == true){
             self.player.position.x += 20
         } else if(isMovingRight == false){
@@ -200,9 +195,80 @@ class GameScene: SKScene {
         } else if(self.player.position.x <= 0) {
             isMovingRight = true
         }
+    }
+    
+    var isUfoMovingRight = true
+    func makeUfoMove() {
+        for i in 0...(ufos.count - 1) {
+        if(isUfoMovingRight == true){
+            self.ufos[i].position.x += 15
+        } else if(isUfoMovingRight == false){
+            self.ufos[i].position.x -= 15
+        }
+        }
         
+        if(self.ufos[ufos.count-1].position.x >= (self.size.width - self.ufos[0].size.width)){
+            isUfoMovingRight = false
+        } else if(self.ufos[0].position.x <= 0) {
+            isUfoMovingRight = true
+        }
+    }
+    
+    func makeAirCraftMove() {
+        if(isMovingRight == true){
+            self.player.position.x += 20
+        } else if(isMovingRight == false){
+            self.player.position.x -= 20
+        }
         
-        //self.movePlayer()
+        if(self.player.position.x >= (self.size.width - self.player.size.width)){
+            isMovingRight = false
+        } else if(self.player.position.x <= 0) {
+            isMovingRight = true
+        }
+    }
+    
+    func makePShuttleMove() {
+        if(isMovingRight == true){
+            self.player.position.x += 20
+        } else if(isMovingRight == false){
+            self.player.position.x -= 20
+        }
+        
+        if(self.player.position.x >= (self.size.width - self.player.size.width)){
+            isMovingRight = false
+        } else if(self.player.position.x <= 0) {
+            isMovingRight = true
+        }
+    }
+    
+    var bullets:[SKSpriteNode] = []
+    
+    func makeBullet(xPosition:CGFloat, yPosition:CGFloat) {
+        // lets add some cats
+        let bullet = SKSpriteNode(imageNamed: "bullet")
+        
+        bullet.position = CGPoint(x:xPosition, y:yPosition)
+        bullet.zPosition = 100
+        
+        // add the cat to the scene
+        addChild(bullet)
+        
+        // add the cat to the cats array
+        self.bullets.append(bullet)
+        
+        print("Where is bullet? \(xPosition), \(yPosition)")
+    }
+
+    
+    var isGridSet = false
+    override func update(_ currentTime: TimeInterval) {
+        // Called before each frame is rendered
+        self.moveBackground()
+        
+        // call player move
+        self.makePlayerMove()
+        
         if (timeOfLastUpdate == nil) {
             timeOfLastUpdate = currentTime
         }
@@ -210,18 +276,28 @@ class GameScene: SKScene {
         let timePassed = (currentTime - timeOfLastUpdate!)
         if (timePassed >= 2) {
             timeOfLastUpdate = currentTime
-            
+            //if(isGridSet == false){
             // Make Ufo Appear on screen
             makeUfoAppear()
             // Make airCraft Appear on screen
             makeAirCraftAppear()
             // Make Shuttle Appear on screen
             makeShuttleAppear()
+          //  }
         }
+        makeUfoMove()
         
         
         
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        let mousePosition = touches.first?.location(in: self)
+        let playerX = self.player.position.x
+        let playerY = self.player.position.y
+        
+        makeBullet(xPosition: playerX, yPosition: playerY)
+    }
     
 }
