@@ -16,6 +16,7 @@ class GameScene: SKScene {
     let background2 = SKSpriteNode(imageNamed: "background")
     var player = SKSpriteNode(imageNamed: "jet")
     var timeBomb:SKSpriteNode?
+    
     // Enemy
     var ufos:[SKSpriteNode] = []
     var aircrafts:[SKSpriteNode] = []
@@ -67,13 +68,14 @@ class GameScene: SKScene {
     
     //creating long background
     func createBackground(){
+        //setting images vertically at the end of one image, just to create one long image
+        
         backgroundColor = SKColor.white
         background.anchorPoint = CGPoint(x: 0, y: 0)
         background.size = CGSize(width: self.size.width, height: self.size.height)
         background.position = CGPoint(x: 0, y: 0)
         background.zPosition = -1
         addChild(background)
-        
         
         background2.size = CGSize(width: self.size.width, height: self.size.height)
         background2.anchorPoint = CGPoint(x: 0, y: 0)
@@ -99,6 +101,8 @@ class GameScene: SKScene {
             background2.position = CGPoint(x: background2.position.x, y: background.position.y + background.size.height)
         }
     }
+    
+    
     override func didMove(to view: SKView) {
         self.createBackground()
         
@@ -125,6 +129,9 @@ class GameScene: SKScene {
         //time bomb
         timeBomb = SKSpriteNode(imageNamed: "bomb")
         timeBomb?.position.x = 0
+        timeBomb?.position.y = 0
+        timeBomb?.anchorPoint = CGPoint(x: 0, y: 0)
+        addChild(timeBomb!)
     }
     
     // variable to keep track of how much time has passed
@@ -142,53 +149,66 @@ class GameScene: SKScene {
     // variable to keep the x position of the last shuttle
     var shuttleInitialPosition:CGFloat = 100
     
+    
+    // Grid Animation for UFO
     func makeUfoAppear() {
         
+        // Action Sequencing
         let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition, y: self.size.height * 0.9), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
+        // running animation for each ufo individually
         if (trackUfoCount <= 3){
-            print("You Can Move \(trackUfoCount)")
             ufos[trackUfoCount].run(sequence)
             trackUfoCount += 1
         }
         
+        // getting initial position of ufo, for setting each ufo exactly beside the previous ufo on grid
         ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
     }
     
+    // Grid Animation for Air Craft
     func makeAirCraftAppear() {
         
+        // Action Sequencing
         let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition, y: self.size.height * 0.8), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
+        // running animation for each Air Craft individually
         if (trackAirCraftCount <= 5){
-            print("You Can Move \(trackAirCraftCount)")
             aircrafts[trackAirCraftCount].run(sequence)
             trackAirCraftCount += 1
         }
         
+        // getting initial position of aircraft, for setting each aircraft exactly beside the previous aircraft on grid
         airCraftInitialPosition = airCraftInitialPosition + aircrafts[trackAirCraftCount-1].size.width
     }
     
+    // Grid Animation for Shuttle
     func makeShuttleAppear() {
         
+        // Action Sequencing
         let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition, y: self.size.height * 0.7), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
+        // running animation for each shuttle individually
         if (trackShuttleCount <= 9){
-            print("You Can Move \(trackShuttleCount)")
             shuttles[trackShuttleCount].run(sequence)
             trackShuttleCount += 1
         }
         
+        // getting initial position of shuttle, for setting each shuttle exactly beside the previous shuttle on grid
         shuttleInitialPosition = shuttleInitialPosition + shuttles[trackShuttleCount-1].size.width
     }
     
-    var isMovingRight = true
     
+    // -------------------
+    // Player Movement Starts
+    // -------------------
+    var isMovingRight = true
     func makePlayerMove() {
         if(isMovingRight == true){
             self.player.position.x += 20
@@ -202,7 +222,14 @@ class GameScene: SKScene {
             isMovingRight = true
         }
     }
+    // -------------------
+    // Player Movement Ends
+    // -------------------
     
+    
+    // -------------------
+    // Ufo Movement Starts
+    // -------------------
     var isUfoMovingRight = true
     func makeUfoMove() {
         
@@ -214,13 +241,20 @@ class GameScene: SKScene {
         }
         }
         
+        // rebouncing of ufo from left to right on basis of first and last ufo in the array list
         if((ufos.last?.position.x)! >= (self.size.width - (self.ufos.first?.size.width)!)){
             isUfoMovingRight = false
         } else if((ufos.first?.position.x)! <= 0) {
             isUfoMovingRight = true
         }
     }
+    // -------------------
+    // Ufo Movement Ends
+    // -------------------
     
+    // -------------------
+    // AirCraft Movement Starts
+    // -------------------
     var isAirCraftMovingRight = false
     func makeAirCraftMove() {
         for i in 0...(aircrafts.count - 1) {
@@ -231,13 +265,20 @@ class GameScene: SKScene {
             }
         }
         
+        // rebouncing of aircraft from left to right on basis of first and last aircraft in the array list
         if((aircrafts.last?.position.x)! >= (self.size.width - (self.aircrafts.first?.size.width)!)){
             isAirCraftMovingRight = false
         } else if((aircrafts.first?.position.x)! <= 0) {
             isAirCraftMovingRight = true
         }
     }
+    // -------------------
+    // AirCraft Movement Ends
+    // -------------------
     
+    // -------------------
+    // Shuttle Movement Starts
+    // -------------------
     var isShuttleMovingRight = true
     func makeShuttleMove() {
         for i in 0...(shuttles.count - 1) {
@@ -248,15 +289,21 @@ class GameScene: SKScene {
             }
         }
         
+        // rebouncing of shuttle from left to right on basis of first and last shuttl in the array list
         if((shuttles.last?.position.x)! >= (self.size.width - (self.shuttles.first?.size.width)!)){
             isShuttleMovingRight = false
         } else if((shuttles.first?.position.x)! <= 0) {
             isShuttleMovingRight = true
         }
     }
+    // -------------------
+    // Shuttle Movement Ends
+    // -------------------
     
+    // -------------------
+    // Player Bullet Starts
+    // -------------------
     var bullets:[SKSpriteNode] = []
-    
     func makeBullet(xPosition:CGFloat, yPosition:CGFloat) {
         // lets add some cats
         let bullet = SKSpriteNode(imageNamed: "bullet")
@@ -269,10 +316,9 @@ class GameScene: SKScene {
         
         // add the cat to the cats array
         self.bullets.append(bullet)
-        
-        print("Where is bullet? \(xPosition), \(yPosition)")
     }
-
+    
+    // moving all bullets in the array by 30
     func moveBullet() {
         if(bullets.count != 0){
         for i in 0...(bullets.count - 1) {
@@ -280,51 +326,46 @@ class GameScene: SKScene {
         }
         }
     }
+    // -------------------
+    // Player Bullet Ends
+    // -------------------
     
-    
+    // -------------------
+    // AirCraft Bullet Starts
+    // -------------------
     var airCraftbullets:[SKSpriteNode] = []
-    
     func makeAirCraftBullet() {
         // randomly generate where the chopstick
         let randomAirBullet = Int.random(in: 0...(aircrafts.count - 1))
         
-        print("\(randomAirBullet)")
         // lets add some cats
-        let airBullet = SKSpriteNode(imageNamed: "bullet")
+        let airBullet = SKSpriteNode(imageNamed: "fireball")
         
-        airBullet.position = CGPoint(x:aircrafts[randomAirBullet].position.x, y:aircrafts[randomAirBullet].position.y)
+        airBullet.position = CGPoint(x:(aircrafts[randomAirBullet].position.x + (aircrafts[randomAirBullet].size.width / 2)), y:aircrafts[randomAirBullet].position.y)
         
         // add the cat to the scene
         addChild(airBullet)
         
         // add the cat to the cats array
         self.airCraftbullets.append(airBullet)
-        
     }
     
-    
+    // moving aircraft bullet by 20
     func moveAirCraftBullet() {
         if(airCraftbullets.count != 0){
             for i in 0...(airCraftbullets.count - 1) {
                 self.airCraftbullets[i].position.y = self.airCraftbullets[i].position.y - 20
             }
         }
-        print("Total air bullets = \(airCraftbullets.count)")
     }
+    // -------------------
+    // AirCraft Bullet Ends
+    // -------------------
     
-    func removeAirBullet() {
-        if(airCraftbullets.count != 0){
-            for i in 0...(airCraftbullets.count - 1) {
-                if(airCraftbullets[i].position.y <= 0) {
-                    self.airCraftbullets.remove(at: i)
-                }
-            }
-        }
-        print("Total remaining air bullets = \(airCraftbullets.count)")
-    }
-    
-    
+    // Variables to set grids and firing aricraft bullet at random time
     var isGridSet = false
+    var isGridSetTimer:TimeInterval?
+    var bulletTime:TimeInterval?
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         self.moveBackground()
@@ -347,23 +388,44 @@ class GameScene: SKScene {
             // Make Shuttle Appear on screen
             makeShuttleAppear()
             
-            makeAirCraftBullet()
+           
         }
 
         
+        // gird setting flag
         if(trackUfoCount == 4 && trackAirCraftCount == 6 && trackShuttleCount == 10){
-            isGridSet = true
+            if (isGridSetTimer == nil) {
+                isGridSetTimer = currentTime
+            }
+            let gridTimePassed = (currentTime - isGridSetTimer!)
+            if(gridTimePassed >= 5) {
+                print("hgjkhgjnk")
+                isGridSet = true
+                isGridSetTimer = currentTime
+            }
         }
         
+        // calling functions to make enemies start moving
         if(isGridSet == true){
             makeUfoMove()
             makeAirCraftMove()
             makeShuttleMove()
             
-            moveAirCraftBullet()
-            removeAirBullet()
+        }
+        
+        
+        if (bulletTime == nil) {
+            bulletTime = currentTime
+        }
+        
+        let bulletTimePassed = (currentTime - bulletTime!)
+        if(bulletTimePassed >= 5 && isGridSet == true) {
+            print("hgjkhgjnk")
+            makeAirCraftBullet()
+            bulletTime = currentTime
         }
 
+        moveAirCraftBullet()
         moveBullet()
 
         
@@ -376,8 +438,12 @@ class GameScene: SKScene {
         var playerX = self.player.position.x + (self.player.size.width / 2)
         var playerY = self.player.position.y + (self.player.size.height / 2)
         
+        
+        // generating player bullet on tap
         makeBullet(xPosition: playerX, yPosition: playerY)
         
     }
+    
+
     
 }
