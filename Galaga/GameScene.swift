@@ -124,20 +124,18 @@ class GameScene: SKScene {
     
     @objc func updateTime() {
         
-        if(timeLeft > 0){
-            let minutes = String(timeLeft / 60)
-            var seconds = "0"
-            if(String(timeLeft % 60) == "0")
-            {
-                seconds = "00"
+        if(timeLeft >= 0){
+            let minutes = (timeLeft / 60)
+            let seconds = (timeLeft % 60)
+            if(seconds <= 9){
+                timeLabel.text = "Time Left: " + String(minutes) + ":0" + String(seconds)
             } else {
-                seconds = String(timeLeft % 60)
+                timeLabel.text = "Time Left: " + String(minutes) + ":" + String(seconds)
             }
-            timeLabel.text = "Time Left: " + minutes + ":" + seconds
             timeLeft -= 1
         }
         
-        if(timeLeft <= 0) {
+        if(timeLeft <= -1) {
             timer.invalidate()
         }
         
@@ -206,15 +204,15 @@ class GameScene: SKScene {
     // variable to keep track of how many ufo are there on screen
     var trackUfoCount = 0
     // variable to keep the x position of the last ufo
-    var ufoInitialPosition:CGFloat = 300
+    var ufoInitialPosition:CGFloat = 225
     // variable to keep track of how many aircraft are there on screen
     var trackAirCraftCount = 0
     // variable to keep the x position of the last aircraft
-    var airCraftInitialPosition:CGFloat = 225
+    var airCraftInitialPosition:CGFloat = 175
     // variable to keep track of how many shuttle are there on screen
     var trackShuttleCount = 0
     // variable to keep the x position of the last shuttle
-    var shuttleInitialPosition:CGFloat = 100
+    var shuttleInitialPosition:CGFloat = 65
     
     
     // Grid Animation for UFO
@@ -466,7 +464,6 @@ class GameScene: SKScene {
             }
             let gridTimePassed = (currentTime - isGridSetTimer!)
             if(gridTimePassed >= 5) {
-                print("hgjkhgjnk")
                 isGridSet = true
                 isGridSetTimer = currentTime
             }
@@ -477,7 +474,8 @@ class GameScene: SKScene {
             makeUfoMove()
             makeAirCraftMove()
             makeShuttleMove()
-            
+            moveBullet()
+            moveAirCraftBullet()
         }
         
         
@@ -487,28 +485,23 @@ class GameScene: SKScene {
         
         let bulletTimePassed = (currentTime - bulletTime!)
         if(bulletTimePassed >= 5 && isGridSet == true) {
-            print("hgjkhgjnk")
             makeAirCraftBullet()
+            
             bulletTime = currentTime
         }
-
-        moveAirCraftBullet()
-        moveBullet()
-
-        
-        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         let mousePosition = touches.first?.location(in: self)
-        var playerX = self.player.position.x + (self.player.size.width / 2)
-        var playerY = self.player.position.y + (self.player.size.height / 2)
+        let playerX = self.player.position.x + (self.player.size.width / 2)
+        let playerY = self.player.position.y + (self.player.size.height / 2)
         
         
         // generating player bullet on tap
-        makeBullet(xPosition: playerX, yPosition: playerY)
-        
+        if(isGridSet == true){
+            makeBullet(xPosition: playerX, yPosition: playerY)
+        }
     }
     
 
