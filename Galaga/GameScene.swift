@@ -16,11 +16,31 @@ class GameScene: SKScene {
     let background2 = SKSpriteNode(imageNamed: "background")
     var player = SKSpriteNode(imageNamed: "jet")
     var timeBomb:SKSpriteNode?
+    var scoreLabel: SKLabelNode!
+    var timeLabel: SKLabelNode!
+    var remainingLife = 3
+    var remainingLifeNode:[SKSpriteNode] = []
+    var timeLeft = 119
     
     // Enemy
     var ufos:[SKSpriteNode] = []
     var aircrafts:[SKSpriteNode] = []
     var shuttles:[SKSpriteNode] = []
+    
+    func makeremainingLife(imgWidth:CGFloat) {
+        // lets add some cats
+        let life = SKSpriteNode(imageNamed: "jet")
+        life.anchorPoint = CGPoint(x: 0, y: 0)
+        life.position = CGPoint(x:(self.size.width - (life.size.width * imgWidth)), y:0)
+        life.anchorPoint = CGPoint(x: 0, y: 0)
+        
+        // add the cat to the scene
+        addChild(life)
+        
+        // add the cat to the cats array
+        self.remainingLifeNode.append(life)
+        print("Life Count = \(remainingLifeNode.count)")
+    }
     
     // Generating UFO
     func makeUfo() {
@@ -102,10 +122,31 @@ class GameScene: SKScene {
         }
     }
     
+    @objc func updateTime() {
+        
+        if(timeLeft > 0){
+            let minutes = String(timeLeft / 60)
+            var seconds = "0"
+            if(String(timeLeft % 60) == "0")
+            {
+                seconds = "00"
+            } else {
+                seconds = String(timeLeft % 60)
+            }
+            timeLabel.text = "Time Left: " + minutes + ":" + seconds
+            timeLeft -= 1
+        }
+        
+        if(timeLeft <= 0) {
+            timer.invalidate()
+        }
+        
+    }
     
+    var timer = Timer()
     override func didMove(to view: SKView) {
         self.createBackground()
-        
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
         // Create player
         self.player.position = CGPoint(x: 0, y: 100)
         self.player.anchorPoint = CGPoint(x: 0, y: 0)
@@ -132,6 +173,32 @@ class GameScene: SKScene {
         timeBomb?.position.y = 0
         timeBomb?.anchorPoint = CGPoint(x: 0, y: 0)
         addChild(timeBomb!)
+        
+        
+        // Label for score
+        scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
+        scoreLabel.fontSize = 50
+        scoreLabel.fontColor = UIColor.yellow
+        scoreLabel.text = "Score: 0"
+        scoreLabel.horizontalAlignmentMode = .left
+        scoreLabel.verticalAlignmentMode = .top
+        scoreLabel.position = CGPoint(x: 0, y: self.size.height)
+        addChild(scoreLabel)
+        
+        // Label for time
+        timeLabel = SKLabelNode(fontNamed: "Chalkduster")
+        timeLabel.fontSize = 50
+        timeLabel.fontColor = UIColor.yellow
+        timeLabel.text = "Time Left: 2:00"
+        timeLabel.horizontalAlignmentMode = .right
+        timeLabel.verticalAlignmentMode = .top
+        timeLabel.position = CGPoint(x: self.size.width, y: self.size.height)
+        addChild(timeLabel)
+        
+        // add life to screen
+        for i in 0...remainingLife - 1 {
+                makeremainingLife(imgWidth: CGFloat(i+1))
+        }
     }
     
     // variable to keep track of how much time has passed
