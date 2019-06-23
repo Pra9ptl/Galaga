@@ -9,24 +9,27 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // Variables for images
     let background = SKSpriteNode(imageNamed: "background")
     let background2 = SKSpriteNode(imageNamed: "background")
     var player = SKSpriteNode(imageNamed: "jet")
+    var moveUFO:SKSpriteNode!
     var timeBomb:SKSpriteNode?
     var scoreLabel: SKLabelNode!
     var timeLabel: SKLabelNode!
     var remainingLife = 3
     var remainingLifeNode:[SKSpriteNode] = []
     var timeLeft = 119
+    var PLspeed: CGFloat = 0
     
     // Enemy
     var ufos:[SKSpriteNode] = []
     var aircrafts:[SKSpriteNode] = []
     var shuttles:[SKSpriteNode] = []
     
+    //showing remaining live on bottom right of screen
     func makeremainingLife(imgWidth:CGFloat) {
         // lets add some cats
         let life = SKSpriteNode(imageNamed: "jet")
@@ -47,12 +50,29 @@ class GameScene: SKScene {
         // lets add some cats
         let ufo = SKSpriteNode(imageNamed: "ufo")
         
+        
         ufo.position = CGPoint(x:0, y:self.size.height + 100)
         ufo.anchorPoint = CGPoint(x: 0, y: 0)
         
         // add the cat to the scene
         addChild(ufo)
+        //---------------------------
+        //CREATING PHYSICS AND MASKS
+        //---------------------------
+        ufo.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: ufo.size.width, height: ufo.size.height))
+        ufo.name = "ufo"
+        ufo.physicsBody?.affectedByGravity = false
+        ufo.physicsBody?.affectedByGravity = false
+        ufo.physicsBody?.allowsRotation = false
+        ufo.physicsBody?.isDynamic = false
+        ufo.physicsBody?.categoryBitMask = 2
+        ufo.physicsBody?.collisionBitMask = 1
+        ufo.physicsBody?.contactTestBitMask = 1
         
+        //---------------------------
+        //END CREATING PHYSICS AND MASKS
+        //---------------------------
         // add the cat to the cats array
         self.ufos.append(ufo)
     }
@@ -67,11 +87,29 @@ class GameScene: SKScene {
         
         // add the cat to the scene
         addChild(airCraft)
+        //---------------------------
+        //CREATING PHYSICS AND MASKS
+        //---------------------------
+        airCraft.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: airCraft.size.width, height: airCraft.size.height))
+        airCraft.name = "aircraft"
+        airCraft.physicsBody?.affectedByGravity = false
+        airCraft.physicsBody?.affectedByGravity = false
+        airCraft.physicsBody?.allowsRotation = false
+        airCraft.physicsBody?.isDynamic = false
+        airCraft.physicsBody?.categoryBitMask = 2
+        airCraft.physicsBody?.collisionBitMask = 1
+        airCraft.physicsBody?.contactTestBitMask = 1
+        
+        //---------------------------
+        //END CREATING PHYSICS AND MASKS
+        //---------------------------
         
         // add the cat to the cats array
         self.aircrafts.append(airCraft)
     }
     
+    var shuttlecnt = 0
     // Generting Shuttles
     func makeShuttle() {
         // lets add some cats
@@ -81,9 +119,22 @@ class GameScene: SKScene {
         shuttle.anchorPoint = CGPoint(x: 0, y: 0)
         // add the cat to the scene
         addChild(shuttle)
+        shuttle.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: shuttle.size.width, height: shuttle.size.height))
+        
+        var shuttleName = "shuttle" + String(shuttlecnt)
+        shuttle.name = shuttleName
+        shuttle.physicsBody?.affectedByGravity = false
+        shuttle.physicsBody?.affectedByGravity = false
+        shuttle.physicsBody?.allowsRotation = false
+        shuttle.physicsBody?.isDynamic = false
+        shuttle.physicsBody?.categoryBitMask = 2
+        shuttle.physicsBody?.collisionBitMask = 1
+        shuttle.physicsBody?.contactTestBitMask = 1
         
         // add the cat to the cats array
         self.shuttles.append(shuttle)
+        shuttlecnt += 1
     }
     
     //creating long background
@@ -143,12 +194,25 @@ class GameScene: SKScene {
     
     var timer = Timer()
     override func didMove(to view: SKView) {
+        self.physicsWorld.contactDelegate = self
         self.createBackground()
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
         // Create player
         self.player.position = CGPoint(x: 0, y: 100)
         self.player.anchorPoint = CGPoint(x: 0, y: 0)
+        player.name = "jet"
+        
         addChild(self.player)
+        
+        self.player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width
+            , height: player.size.height))
+        self.player.physicsBody?.affectedByGravity = false
+        self.player.physicsBody?.allowsRotation = false
+        self.player.physicsBody?.isDynamic = false
+        self.player.physicsBody?.categoryBitMask = 4
+        self.player.physicsBody?.collisionBitMask = 8
+        self.player.physicsBody?.contactTestBitMask = 8
+        
         
         // drawing UFO
         for _ in 0...3 {
@@ -164,7 +228,7 @@ class GameScene: SKScene {
         for _ in 0...9 {
             makeShuttle()
         }
-    
+        
         //time bomb
         timeBomb = SKSpriteNode(imageNamed: "bomb")
         timeBomb?.position.x = 0
@@ -195,7 +259,7 @@ class GameScene: SKScene {
         
         // add life to screen
         for i in 0...remainingLife - 1 {
-                makeremainingLife(imgWidth: CGFloat(i+1))
+            makeremainingLife(imgWidth: CGFloat(i+1))
         }
     }
     
@@ -227,10 +291,11 @@ class GameScene: SKScene {
         if (trackUfoCount <= 3){
             ufos[trackUfoCount].run(sequence)
             trackUfoCount += 1
+            // getting initial position of ufo, for setting each ufo exactly beside the previous ufo on grid
+            ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
         }
         
-        // getting initial position of ufo, for setting each ufo exactly beside the previous ufo on grid
-        ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
+        
     }
     
     // Grid Animation for Air Craft
@@ -255,16 +320,16 @@ class GameScene: SKScene {
     func makeShuttleAppear() {
         
         // Action Sequencing
-        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
+        //let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
         let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition, y: self.size.height * 0.7), duration: 2)
-        let sequence:SKAction = SKAction.sequence([m1, m2])
+        let sequence:SKAction = SKAction.sequence([/*m1,*/ m2])
         
         // running animation for each shuttle individually
         if (trackShuttleCount <= 9){
             shuttles[trackShuttleCount].run(sequence)
-            trackShuttleCount += 1
+            
         }
-        
+        trackShuttleCount += 1
         // getting initial position of shuttle, for setting each shuttle exactly beside the previous shuttle on grid
         shuttleInitialPosition = shuttleInitialPosition + shuttles[trackShuttleCount-1].size.width
     }
@@ -299,11 +364,11 @@ class GameScene: SKScene {
     func makeUfoMove() {
         
         for i in 0...(ufos.count - 1) {
-        if(isUfoMovingRight == true){
-            self.ufos[i].position.x += 10
-        } else if(isUfoMovingRight == false){
-            self.ufos[i].position.x -= 10
-        }
+            if(isUfoMovingRight == true){
+                self.ufos[i].position.x += 10
+            } else if(isUfoMovingRight == false){
+                self.ufos[i].position.x -= 10
+            }
         }
         
         // rebouncing of ufo from left to right on basis of first and last ufo in the array list
@@ -378,7 +443,13 @@ class GameScene: SKScene {
         
         // add the cat to the scene
         addChild(bullet)
-        
+        bullet.name = "bullet"
+        bullet.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: bullet.size.width,height: bullet.size.height))
+        bullet.physicsBody?.affectedByGravity = false
+        bullet.physicsBody?.allowsRotation = false
+        bullet.physicsBody?.categoryBitMask = 1
+        bullet.physicsBody?.collisionBitMask = 2
+        bullet.physicsBody?.contactTestBitMask = 2
         // add the cat to the cats array
         self.bullets.append(bullet)
     }
@@ -386,9 +457,9 @@ class GameScene: SKScene {
     // moving all bullets in the array by 30
     func moveBullet() {
         if(bullets.count != 0){
-        for i in 0...(bullets.count - 1) {
-            self.bullets[i].position.y = self.bullets[i].position.y + 30
-        }
+            for i in 0...(bullets.count - 1) {
+                self.bullets[i].position.y = self.bullets[i].position.y + 30
+            }
         }
     }
     // -------------------
@@ -403,14 +474,29 @@ class GameScene: SKScene {
         // randomly generate where the chopstick
         let randomAirBullet = Int.random(in: 0...(aircrafts.count - 1))
         
-        // lets add some cats
+        // lets add some bullets
         let airBullet = SKSpriteNode(imageNamed: "fireball")
         
         airBullet.position = CGPoint(x:(aircrafts[randomAirBullet].position.x + (aircrafts[randomAirBullet].size.width / 2)), y:aircrafts[randomAirBullet].position.y)
         
-        // add the cat to the scene
+        // add the bullets to the scene
         addChild(airBullet)
+        //---------------------------
+        //CREATING PHYSICS AND MASKS
+        //---------------------------
+        airBullet.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: airBullet.size.width, height: airBullet.size.height))
+        airBullet.name = "airbullet"
+        airBullet.physicsBody?.affectedByGravity = false
+        airBullet.physicsBody?.allowsRotation = false
+        airBullet.physicsBody?.isDynamic = false
+        airBullet.physicsBody?.categoryBitMask = 8
+        //        airBullet.physicsBody?.collisionBitMask = 4
+        //        airBullet.physicsBody?.contactTestBitMask = 4
         
+        //---------------------------
+        //END CREATING PHYSICS AND MASKS
+        //---------------------------
         // add the cat to the cats array
         self.airCraftbullets.append(airBullet)
     }
@@ -427,16 +513,171 @@ class GameScene: SKScene {
     // AirCraft Bullet Ends
     // -------------------
     
+    
+    // -------------------
+    // Making UFO move towards the player
+    // -------------------
+    var xd:CGFloat = 0
+    var yd:CGFloat = 0
+    var UFOremoveCount = 0
+    var pastTime:TimeInterval?
+    func enemyTowardsPlayer(time:TimeInterval){
+        
+        if (pastTime == nil) {
+            pastTime = time
+        }
+        
+        let timePassed = (time - pastTime!)
+        if (timePassed >= 10 && ufos.count > 1) {
+            
+            let randomUFOMove = Int.random(in: 0...(ufos.count - 1))
+            moveUFO = ufos[randomUFOMove]
+            ufos.remove(at: randomUFOMove)
+            pastTime = time
+            
+            
+        }
+        if(moveUFO != nil){
+            let a = player.position.x - moveUFO.position.x
+            // (y2-y1)
+            let b = player.position.y - moveUFO.position.y
+            // d
+            let d = sqrt( (a*a) + (b*b))
+            
+            self.xd = a/d
+            self.yd = b/d
+            moveUFO.position.x = moveUFO.position.x + self.xd * 10
+            moveUFO.position.y = moveUFO.position.y + (self.yd - 1.5) * 6}
+        
+    }
+    
+    //MOVING PLAYER ON TAP
+    func movePlayerOnTap(speed:CGFloat,mousePos:CGPoint)
+    {
+        //  self.player.position.x += speed
+        
+        let a =  mousePos.x - player.position.x
+        // (y2-y1)
+        let b = mousePos.y - player.position.y
+        // d
+        let d = sqrt( (a*a) + (b*b))
+        
+        self.xd = a/d
+        self.yd = b/d
+        player.position.x = player.position.x + self.xd * speed
+        player.position.x = (player.position.x + self.yd * speed)
+        //        if(self.player.position.x >= (self.size.width - self.player.size.width)){
+        //            PLspeed = 0
+        //        } else if(self.player.position.x <= 0) {
+        //            PLspeed = 0
+        //        }
+    }
+    func didBegin(_ contact: SKPhysicsContact) {
+        let objectA = contact.bodyA.node!
+        let objectB = contact.bodyB.node!
+        // COLLISION WITH UFO
+        if (objectA.name == "bullet" && objectB.name == "ufo") {
+            // print("GAME OVER!")
+            objectB.removeFromParent()
+            objectA.removeFromParent()
+        }
+        else if (objectA.name == "ufo" && objectB.name == "bullet") {
+            //print("GAME OVER!")
+            objectA.removeFromParent()
+            objectB.removeFromParent()
+        }
+        // COLLISION WITH AIRCRAFT
+        if (objectA.name == "bullet" && objectB.name == "aircraft") {
+            // print("GAME OVER!")
+            objectB.removeFromParent()
+            objectA.removeFromParent()
+        }
+        else if (objectA.name == "aircraft" && objectB.name == "bullet") {
+            // print("GAME OVER!")
+            objectA.removeFromParent()
+            objectB.removeFromParent()
+        }
+        
+        
+        for i in 0...shuttles.count - 1 {
+            // COLLISION WITH SHUTTLE
+            if (objectA.name == "bullet" && objectB.name == "shuttle" + String(i)) {
+                // print("GAME OVER!")
+                print("Count Shuttle b4 == \(shuttles.count)")
+                print("Track Shuttle b4 == \(trackShuttleCount)")
+                objectB.removeFromParent()
+                objectA.removeFromParent()
+                shuttles.remove(at: i)
+                trackShuttleCount -= 1
+                print("Count Shuttle == \(shuttles.count)")
+                print("Track Shuttle == \(trackShuttleCount)")
+            }
+            else if (objectA.name == "shuttle" + String(i) && objectB.name == "bullet") {
+                // print("GAME OVER!")
+                print("Count Shuttle b4 == \(shuttles.count)")
+                print("Track Shuttle b4 == \(trackShuttleCount)")
+                objectA.removeFromParent()
+                objectB.removeFromParent()
+                shuttles.remove(at: i)
+                trackShuttleCount -= 1
+                print("Count Shuttle == \(shuttles.count)")
+                print("Track Shuttle b4 == \(trackShuttleCount)")
+            }
+        }
+        // COLLISION WITH SHUTTLE
+        if (objectA.name == "bullet" && objectB.name == "shuttle") {
+            // print("GAME OVER!")
+            objectB.removeFromParent()
+            objectA.removeFromParent()
+        }
+        else if (objectA.name == "shuttle" && objectB.name == "bullet") {
+            // print("GAME OVER!")
+            objectA.removeFromParent()
+            objectB.removeFromParent()
+        }
+        // ENEMY BULLET WITH PLAYER
+        if (objectA.name == "airbullet" && objectB.name == "jet") {
+            print("PLAYER DIE")
+            remainingLife -= 1
+            objectB.removeFromParent()
+            objectA.removeFromParent()
+        }
+        else if (objectA.name == "jet" && objectB.name == "airbullet") {
+            print("PLAYER DIE")
+            remainingLife -= 1
+            objectA.removeFromParent()
+            objectB.removeFromParent()
+        }
+        
+        
+        //        else if (objectA.name == "cat" && objectB.name == "bed") {
+        //            print("YOU WIN")
+        //            // stop moving the cat when game wins
+        //            objectA.physicsBody?.isDynamic = false
+        //        }
+        //        else if (objectA.name == "bed" && objectB.name == "cat") {
+        //            print("YOU WIN")
+        //            // stop moving the cat when game wins
+        //            objectB.physicsBody?.isDynamic = false;
+        //        }
+        // GAME WIN RULES
+    }
+    
+    
+    
     // Variables to set grids and firing aricraft bullet at random time
     var isGridSet = false
     var isGridSetTimer:TimeInterval?
     var bulletTime:TimeInterval?
+    var playerBulletTime:TimeInterval?
+    
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         self.moveBackground()
         
         // call player move
-        self.makePlayerMove()
+        //self.makePlayerMove()
         
         if (timeOfLastUpdate == nil) {
             timeOfLastUpdate = currentTime
@@ -453,9 +694,8 @@ class GameScene: SKScene {
             // Make Shuttle Appear on screen
             makeShuttleAppear()
             
-           
+            
         }
-
         
         // gird setting flag
         if(trackUfoCount == 4 && trackAirCraftCount == 6 && trackShuttleCount == 10){
@@ -476,8 +716,27 @@ class GameScene: SKScene {
             makeShuttleMove()
             moveBullet()
             moveAirCraftBullet()
+            
+            //calling the enemy move functon
+            enemyTowardsPlayer(time: currentTime)
+            
         }
         
+        //PLAYER AUTOMATIC BULLET
+        if (playerBulletTime == nil) {
+            playerBulletTime = currentTime
+        }
+        let PLbulletTimePassed = (currentTime - playerBulletTime!)
+        if(PLbulletTimePassed >= 2 && isGridSet == true) {
+            
+            //AUTOMATIC BULLETS
+            let playerX = self.player.position.x + (self.player.size.width / 2)
+            let playerY = self.player.position.y + (self.player.size.height / 2)
+            
+            makeBullet(xPosition: playerX, yPosition: playerY)
+            playerBulletTime = currentTime
+        }
+        //END PLAYER AUTOMATIC BULLET ------------------
         
         if (bulletTime == nil) {
             bulletTime = currentTime
@@ -489,21 +748,29 @@ class GameScene: SKScene {
             
             bulletTime = currentTime
         }
+        
+        //PLAYER MOVEMENT
+        if(mousePosition != nil){
+            movePlayerOnTap(speed: PLspeed,mousePos: mousePosition!)
+        }
+        if(moveUFO != nil){
+            if (self.player.intersects(moveUFO) == true) {
+                moveUFO.removeFromParent()
+            }
+            
+        }
+        
     }
+    
+    
+    var mousePosition:CGPoint?
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        let mousePosition = touches.first?.location(in: self)
-        let playerX = self.player.position.x + (self.player.size.width / 2)
-        let playerY = self.player.position.y + (self.player.size.height / 2)
+        mousePosition = touches.first?.location(in: self)
         
-        
-        // generating player bullet on tap
-        if(isGridSet == true){
-            makeBullet(xPosition: playerX, yPosition: playerY)
-        }
+        PLspeed = 20
     }
     
-
     
 }
