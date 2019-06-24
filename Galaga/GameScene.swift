@@ -1006,10 +1006,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(remainingLifeNode.count == 0)
 			{
 				//ADD A GAME OVER SCENE
-				let newScene = GameScene(size: self.size)
-				newScene.scaleMode = self.scaleMode
-				let animation = SKTransition.fade(withDuration: 1.0)
-				self.view?.presentScene(newScene, transition: animation)
+				let scene = SKScene(fileNamed: "lose")
+				scene!.scaleMode = .aspectFill
+				
+				let flipTransition = SKTransition.flipVertical(withDuration: 2)
+				
+				self.scene?.view?.presentScene(scene!, transition: flipTransition)
 			}
 			decreaseLivescount = false;
 			print(" flag after \(decreaseLivescount) ")
@@ -1194,13 +1196,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			// enemyTowardsPlayer(time: currentTime)
 			
 		}
-		
+	
 		//PLAYER AUTOMATIC BULLET
 		if (playerBulletTime == nil) {
 			playerBulletTime = currentTime
 		}
 		let PLbulletTimePassed = (currentTime - playerBulletTime!)
-		if(PLbulletTimePassed >= 1 && isGridSet == true) {
+		if(PLbulletTimePassed >= 0.5 && isGridSet == true) {
 			
 			//AUTOMATIC BULLETS
 			let playerX = self.player.position.x + (self.player.size.width / 2)
@@ -1214,7 +1216,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			playerBulletTime = currentTime
 		}
 		//END PLAYER AUTOMATIC BULLET ------------------
-		
+	
 		if (bulletTime == nil) {
 			bulletTime = currentTime
 		}
@@ -1261,7 +1263,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			onDeploy = currentTime
 		}
 		let beforeDeployTime = (currentTime - onDeploy!)
-		if(beforeDeployTime >= 35) {
+		if(beforeDeployTime >= 5) {
 			canDeployerBomb = true
 			onDeploy = nil
 			print("Can Deploy Bomb")
@@ -1275,14 +1277,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(afterDeployTime >= 1) {
 				blastTime = currentTime
 				blastCountDown -= 1
-				print("\(blastCountDown)")
+				//print("\(blastCountDown)")
 			}
 			
 			if(blastCountDown == 0){
 				print("BOOM!!!")
 				if(randomEnemy != nil){
 					if(randomEnemy == 0){
-						print("\(ufocnt / 2)")
+						//print("\(ufocnt / 2)")
 						if(ufocnt <= 4){
 						for i in 0...ufos.count-1{
 							if(i%2 == 0){
@@ -1320,7 +1322,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							}
 						}
 					} else if(randomEnemy == 1){
-						print("\(aircnt / 2)")
+						//print("\(aircnt / 2)")
 						if(aircnt <= 6){
 							for i in 0...aircrafts.count-1{
 								if(i%2 == 0){
@@ -1358,7 +1360,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							}
 						}
 					} else if(randomEnemy == 2) {
-						print("\(shuttlecnt / 2)")
+					//	print("\(shuttlecnt / 2)")
 						if(shuttlecnt <= 10){
 							for i in 0...shuttles.count-1{
 								if(i%2 == 0){
@@ -1462,7 +1464,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			self.scene?.view?.presentScene(scene!, transition: flipTransition)
 			} else if (ufore == 0 &&  aircraftre == 0 && shuttlere == 0) {
-				print ("you Win")
+				//print ("you Win")
 				let scene = SKScene(fileNamed: "win")
 				scene!.scaleMode = .aspectFill
 				
@@ -1579,9 +1581,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 				makeBomb()
 				moveBombToTop()
 				
-				print("Bomb Deployed")
+				//print("Bomb Deployed")
 				if (randomEnemy == 0) {
-					print("\(ufos.count) :: \(ufos2.count)")
+					//print("\(ufos.count) :: \(ufos2.count)")
 					for i in 0...ufos.count-1{
 						if (ufos[i].parent != nil){
 							ufocnt += 1
@@ -1594,9 +1596,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 						}
 					}
 					}
-					print("ufo cnt = \(ufocnt)")
+					//print("ufo cnt = \(ufocnt)")
 				} else if (randomEnemy == 1) {
-					print("\(aircrafts.count) :: \(aircrafts2.count)")
+					//print("\(aircrafts.count) :: \(aircrafts2.count)")
 					for i in 0...aircrafts.count-1{
 						if (aircrafts[i].parent != nil){
 							aircnt += 1
@@ -1609,9 +1611,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 						}
 					}
 					}
-					print("Air Craft cnt = \(aircnt)")
+				//	print("Air Craft cnt = \(aircnt)")
 				} else if (randomEnemy == 2) {
-					print("\(shuttles.count) :: \(shuttles2.count)")
+				//	print("\(shuttles.count) :: \(shuttles2.count)")
 					for i in 0...shuttles.count-1{
 						if (shuttles[i].parent != nil){
 							shuttlecnt += 1
@@ -1624,7 +1626,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 						}
 					}
 					}
-					print("Shuttle cnt = \(shuttlecnt)")
+					//print("Shuttle cnt = \(shuttlecnt)")
 				}
 				bombcnt += 1
 				canDeployerBomb = false
