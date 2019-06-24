@@ -1197,7 +1197,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 		}
 		
-		/*//PLAYER AUTOMATIC BULLET
+		//PLAYER AUTOMATIC BULLET
 		if (playerBulletTime == nil) {
 			playerBulletTime = currentTime
 		}
@@ -1216,7 +1216,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			playerBulletTime = currentTime
 		}
 		//END PLAYER AUTOMATIC BULLET ------------------
-		*/
+		
 		if (bulletTime == nil) {
 			bulletTime = currentTime
 		}
