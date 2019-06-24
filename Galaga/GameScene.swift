@@ -1,3 +1,4 @@
+
 //
 //  GameScene.swift
 //  Galaga
@@ -8,26 +9,42 @@
 
 import SpriteKit
 import GameplayKit
+import AVKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    
     // Variables for images
     let background = SKSpriteNode(imageNamed: "background")
     let background2 = SKSpriteNode(imageNamed: "background")
     var player = SKSpriteNode(imageNamed: "jet")
+    
+    var playerShield = SKSpriteNode(imageNamed: "shield")
     var moveUFO:SKSpriteNode!
     var timeBomb:SKSpriteNode?
     var scoreLabel: SKLabelNode!
     var timeLabel: SKLabelNode!
     var remainingLife = 3
+    var UFODown = 0
+    var playerScore = 0;
+    var playershoot:AVAudioPlayer!
+    var playerdie:AVAudioPlayer!
+    var ufocoming:AVAudioPlayer!
+    var ufodie:AVAudioPlayer!
     var remainingLifeNode:[SKSpriteNode] = []
+    var decreaseLivescount:Bool = false;
     var timeLeft = 119
+    // variable to store scores
+    var socreCount:Int = 0;
     var PLspeed: CGFloat = 0
-    
+    var isShieldActive = false
+    var timeForShieldActive:TimeInterval?
     // Enemy
     var ufos:[SKSpriteNode] = []
     var aircrafts:[SKSpriteNode] = []
     var shuttles:[SKSpriteNode] = []
+    
+    var ufos2:[SKSpriteNode] = []
+    var aircrafts2:[SKSpriteNode] = []
+    var shuttles2:[SKSpriteNode] = []
     
     //showing remaining live on bottom right of screen
     func makeremainingLife(imgWidth:CGFloat) {
@@ -77,6 +94,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.ufos.append(ufo)
     }
     
+    // Generating UFO2
+    func makeUfo2() {
+        // lets add some cats
+        let ufo2 = SKSpriteNode(imageNamed: "ufo")
+        
+        
+        ufo2.position = CGPoint(x:0, y:self.size.height + 100)
+        ufo2.anchorPoint = CGPoint(x: 0, y: 0)
+        
+        // add the cat to the scene
+        addChild(ufo2)
+        //---------------------------
+        //CREATING PHYSICS AND MASKS
+        //---------------------------
+        ufo2.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: ufo2.size.width, height: ufo2.size.height))
+        ufo2.name = "ufo"
+        ufo2.physicsBody?.affectedByGravity = false
+        ufo2.physicsBody?.affectedByGravity = false
+        ufo2.physicsBody?.allowsRotation = false
+        ufo2.physicsBody?.isDynamic = false
+        ufo2.physicsBody?.categoryBitMask = 2
+        ufo2.physicsBody?.collisionBitMask = 1
+        ufo2.physicsBody?.contactTestBitMask = 1
+        
+        //---------------------------
+        //END CREATING PHYSICS AND MASKS
+        //---------------------------
+        // add the cat to the cats array
+        self.ufos2.append(ufo2)
+    }
+    
     // Generting AirCraft
     func makeAirCraft() {
         // lets add some cats
@@ -109,7 +158,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.aircrafts.append(airCraft)
     }
     
-    var shuttlecnt = 0
+    // Generting AirCraft2
+    func makeAirCraft2() {
+        // lets add some cats
+        let airCraft2 = SKSpriteNode(imageNamed: "aircraft")
+        
+        airCraft2.position = CGPoint(x:self.size.width, y:self.size.height + 100)
+        airCraft2.anchorPoint = CGPoint(x: 0, y: 0)
+        
+        // add the cat to the scene
+        addChild(airCraft2)
+        //---------------------------
+        //CREATING PHYSICS AND MASKS
+        //---------------------------
+        airCraft2.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: airCraft2.size.width, height: airCraft2.size.height))
+        airCraft2.name = "aircraft"
+        airCraft2.physicsBody?.affectedByGravity = false
+        airCraft2.physicsBody?.affectedByGravity = false
+        airCraft2.physicsBody?.allowsRotation = false
+        airCraft2.physicsBody?.isDynamic = false
+        airCraft2.physicsBody?.categoryBitMask = 2
+        airCraft2.physicsBody?.collisionBitMask = 1
+        airCraft2.physicsBody?.contactTestBitMask = 1
+        
+        //---------------------------
+        //END CREATING PHYSICS AND MASKS
+        //---------------------------
+        
+        // add the cat to the cats array
+        self.aircrafts2.append(airCraft2)
+    }
+    
     // Generting Shuttles
     func makeShuttle() {
         // lets add some cats
@@ -121,9 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(shuttle)
         shuttle.physicsBody = SKPhysicsBody(
             rectangleOf: CGSize(width: shuttle.size.width, height: shuttle.size.height))
-        
-        var shuttleName = "shuttle" + String(shuttlecnt)
-        shuttle.name = shuttleName
+        shuttle.name = "shuttle"
         shuttle.physicsBody?.affectedByGravity = false
         shuttle.physicsBody?.affectedByGravity = false
         shuttle.physicsBody?.allowsRotation = false
@@ -134,7 +212,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // add the cat to the cats array
         self.shuttles.append(shuttle)
-        shuttlecnt += 1
+    }
+    
+    // Generting Shuttles2
+    func makeShuttle2() {
+        // lets add some cats
+        let shuttle2 = SKSpriteNode(imageNamed: "shuttle")
+        
+        shuttle2.position = CGPoint(x:(self.size.width / 2), y:self.size.height + 100)
+        shuttle2.anchorPoint = CGPoint(x: 0, y: 0)
+        // add the cat to the scene
+        addChild(shuttle2)
+        shuttle2.physicsBody = SKPhysicsBody(
+            rectangleOf: CGSize(width: shuttle2.size.width, height: shuttle2.size.height))
+        shuttle2.name = "shuttle"
+        shuttle2.physicsBody?.affectedByGravity = false
+        shuttle2.physicsBody?.affectedByGravity = false
+        shuttle2.physicsBody?.allowsRotation = false
+        shuttle2.physicsBody?.isDynamic = false
+        shuttle2.physicsBody?.categoryBitMask = 2
+        shuttle2.physicsBody?.collisionBitMask = 1
+        shuttle2.physicsBody?.contactTestBitMask = 1
+        
+        // add the cat to the cats array
+        self.shuttles2.append(shuttle2)
     }
     
     //creating long background
@@ -194,6 +295,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var timer = Timer()
     override func didMove(to view: SKView) {
+        
+        //SOUNDS
+        
+        let ul1 = Bundle.main.url(forResource: "playershoot", withExtension: "wav")
+        let ul2 = Bundle.main.url(forResource: "playerdie", withExtension: "wav")
+        let ul3 = Bundle.main.url(forResource: "ufocoming", withExtension: "wav")
+        let ul4 = Bundle.main.url(forResource: "ufodie", withExtension: "wav")
+        do{
+            playershoot =
+                try AVAudioPlayer(contentsOf: ul1!)
+            playerdie =
+                try  AVAudioPlayer(contentsOf: ul2!)
+            ufocoming =
+                try AVAudioPlayer(contentsOf: ul3!)
+            ufodie =
+                try  AVAudioPlayer(contentsOf: ul4!)
+            playershoot.prepareToPlay()
+            playerdie.prepareToPlay()
+            ufocoming.prepareToPlay()
+            ufodie.prepareToPlay()
+        }
+        catch{
+            print("error")
+        }
+        ///-END SOUNDS
+        
+        
         self.physicsWorld.contactDelegate = self
         self.createBackground()
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
@@ -229,6 +357,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             makeShuttle()
         }
         
+        // generate group 2 of enemy
+        for _ in 0...3 {
+            makeUfo2()
+        }
+        
+        // drawing AirCraft
+        for _ in 0...5 {
+            makeAirCraft2()
+        }
+        
+        // draw shuttle
+        for _ in 0...9 {
+            makeShuttle2()
+        }
+        
         //time bomb
         timeBomb = SKSpriteNode(imageNamed: "bomb")
         timeBomb?.position.x = 0
@@ -236,6 +379,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         timeBomb?.anchorPoint = CGPoint(x: 0, y: 0)
         addChild(timeBomb!)
         
+        //Shield
+        playerShield.anchorPoint = CGPoint(x: 0.5, y: 0)
+        playerShield.position = CGPoint(x: (self.size.width / 2), y: 0)
+        playerShield.size = CGSize(width: 64, height: 64)
+        playerShield.name = "shield"
+        addChild(playerShield)
         
         // Label for score
         scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
@@ -278,13 +427,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     // variable to keep the x position of the last shuttle
     var shuttleInitialPosition:CGFloat = 65
     
+    // variable to keep track of how many ufo are there on screen
+    var trackUfoCount2 = 0
+    // variable to keep the x position of the last ufo
+    var ufoInitialPosition2:CGFloat = 225
+    // variable to keep track of how many aircraft are there on screen
+    var trackAirCraftCount2 = 0
+    // variable to keep the x position of the last aircraft
+    var airCraftInitialPosition2:CGFloat = 175
+    // variable to keep track of how many shuttle are there on screen
+    var trackShuttleCount2 = 0
+    // variable to keep the x position of the last shuttle
+    var shuttleInitialPosition2:CGFloat = 65
+    
     
     // Grid Animation for UFO
-    func makeUfoAppear() {
+    func makeUfoAppear(heightPercent: CGFloat) {
         
         // Action Sequencing
         let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
-        let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition, y: self.size.height * 0.9), duration: 2)
+        let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition, y: self.size.height * heightPercent), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
         // running animation for each ufo individually
@@ -294,16 +456,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // getting initial position of ufo, for setting each ufo exactly beside the previous ufo on grid
             ufoInitialPosition = ufoInitialPosition + ufos[trackUfoCount-1].size.width
         }
+    }
+    
+    // Grid Animation for UFO2
+    func makeUfoAppear2(heightPercent: CGFloat) {
         
+        // Action Sequencing
+        let m2 = SKAction.move(to: CGPoint(x: ufoInitialPosition2, y: self.size.height * heightPercent), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m2])
         
+        // running animation for each ufo individually
+        if (trackUfoCount2 <= 3){
+            ufos2[trackUfoCount2].run(sequence)
+            trackUfoCount2 += 1
+            // getting initial position of ufo, for setting each ufo exactly beside the previous ufo on grid
+            ufoInitialPosition2 = ufoInitialPosition2 + ufos2[trackUfoCount2-1].size.width
+        }
     }
     
     // Grid Animation for Air Craft
-    func makeAirCraftAppear() {
+    func makeAirCraftAppear(heightPercent: CGFloat) {
         
         // Action Sequencing
         let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
-        let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition, y: self.size.height * 0.8), duration: 2)
+        let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition, y: self.size.height * heightPercent), duration: 2)
         let sequence:SKAction = SKAction.sequence([m1, m2])
         
         // running animation for each Air Craft individually
@@ -316,22 +492,56 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         airCraftInitialPosition = airCraftInitialPosition + aircrafts[trackAirCraftCount-1].size.width
     }
     
-    // Grid Animation for Shuttle
-    func makeShuttleAppear() {
+    // Grid Animation for Air Craft2
+    func makeAirCraftAppear2(heightPercent: CGFloat) {
         
         // Action Sequencing
-        //let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
-        let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition, y: self.size.height * 0.7), duration: 2)
-        let sequence:SKAction = SKAction.sequence([/*m1,*/ m2])
+        let m2 = SKAction.move(to: CGPoint(x: airCraftInitialPosition2, y: self.size.height * heightPercent), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m2])
+        
+        // running animation for each Air Craft individually
+        if (trackAirCraftCount2 <= 5){
+            aircrafts2[trackAirCraftCount2].run(sequence)
+            trackAirCraftCount2 += 1
+        }
+        
+        // getting initial position of aircraft, for setting each aircraft exactly beside the previous aircraft on grid
+        airCraftInitialPosition2 = airCraftInitialPosition2 + aircrafts2[trackAirCraftCount2-1].size.width
+    }
+    
+    // Grid Animation for Shuttle
+    func makeShuttleAppear(heightPercent: CGFloat) {
+        
+        // Action Sequencing
+        let m1 = SKAction.move(to: CGPoint(x: self.size.width/2, y: self.size.height / 2), duration: 2)
+        let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition, y: self.size.height * heightPercent), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m1, m2])
         
         // running animation for each shuttle individually
         if (trackShuttleCount <= 9){
             shuttles[trackShuttleCount].run(sequence)
-            
+            trackShuttleCount += 1
         }
-        trackShuttleCount += 1
+        
         // getting initial position of shuttle, for setting each shuttle exactly beside the previous shuttle on grid
         shuttleInitialPosition = shuttleInitialPosition + shuttles[trackShuttleCount-1].size.width
+    }
+    
+    // Grid Animation for Shuttle2
+    func makeShuttleAppear2(heightPercent: CGFloat) {
+        
+        // Action Sequencing
+        let m2 = SKAction.move(to: CGPoint(x: shuttleInitialPosition2, y: self.size.height * heightPercent), duration: 2)
+        let sequence:SKAction = SKAction.sequence([m2])
+        
+        // running animation for each shuttle individually
+        if (trackShuttleCount2 <= 9){
+            shuttles2[trackShuttleCount2].run(sequence)
+            trackShuttleCount2 += 1
+        }
+        
+        // getting initial position of shuttle, for setting each shuttle exactly beside the previous shuttle on grid
+        shuttleInitialPosition2 = shuttleInitialPosition2 + shuttles2[trackShuttleCount2-1].size.width
     }
     
     
@@ -378,6 +588,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             isUfoMovingRight = true
         }
     }
+    
+    var isUfoMovingRight2 = true
+    func makeUfoMove2() {
+        
+        for i in 0...(ufos2.count - 1) {
+            if(isUfoMovingRight2 == true){
+                self.ufos2[i].position.x += 10
+            } else if(isUfoMovingRight2 == false){
+                self.ufos2[i].position.x -= 10
+            }
+        }
+        
+        // rebouncing of ufo from left to right on basis of first and last ufo in the array list
+        if((ufos2.last?.position.x)! >= (self.size.width - (self.ufos2.first?.size.width)!)){
+            isUfoMovingRight2 = false
+        } else if((ufos2.first?.position.x)! <= 0) {
+            isUfoMovingRight2 = true
+        }
+    }
     // -------------------
     // Ufo Movement Ends
     // -------------------
@@ -402,6 +631,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             isAirCraftMovingRight = true
         }
     }
+    
+    var isAirCraftMovingRight2 = false
+    func makeAirCraftMove2() {
+        for i in 0...(aircrafts2.count - 1) {
+            if(isAirCraftMovingRight2 == true){
+                self.aircrafts2[i].position.x += 10
+            } else if(isAirCraftMovingRight2 == false){
+                self.aircrafts2[i].position.x -= 10
+            }
+        }
+        
+        // rebouncing of aircraft from left to right on basis of first and last aircraft in the array list
+        if((aircrafts2.last?.position.x)! >= (self.size.width - (self.aircrafts2.first?.size.width)!)){
+            isAirCraftMovingRight2 = false
+        } else if((aircrafts2.first?.position.x)! <= 0) {
+            isAirCraftMovingRight2 = true
+        }
+    }
     // -------------------
     // AirCraft Movement Ends
     // -------------------
@@ -424,6 +671,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             isShuttleMovingRight = false
         } else if((shuttles.first?.position.x)! <= 0) {
             isShuttleMovingRight = true
+        }
+    }
+    
+    var isShuttleMovingRight2 = true
+    func makeShuttleMove2() {
+        for i in 0...(shuttles2.count - 1) {
+            if(isShuttleMovingRight2 == true){
+                self.shuttles2[i].position.x += 10
+            } else if(isShuttleMovingRight2 == false){
+                self.shuttles2[i].position.x -= 10
+            }
+        }
+        
+        // rebouncing of shuttle from left to right on basis of first and last shuttl in the array list
+        if((shuttles2.last?.position.x)! >= (self.size.width - (self.shuttles2.first?.size.width)!)){
+            isShuttleMovingRight2 = false
+        } else if((shuttles2.first?.position.x)! <= 0) {
+            isShuttleMovingRight2 = true
         }
     }
     // -------------------
@@ -459,6 +724,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if(bullets.count != 0){
             for i in 0...(bullets.count - 1) {
                 self.bullets[i].position.y = self.bullets[i].position.y + 30
+                //remove bullet from scene
+                if(bullets[i].position.y > self.size.height)
+                {
+                    bullets[i].removeFromParent()
+                }
             }
         }
     }
@@ -488,8 +758,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             rectangleOf: CGSize(width: airBullet.size.width, height: airBullet.size.height))
         airBullet.name = "airbullet"
         airBullet.physicsBody?.affectedByGravity = false
-        airBullet.physicsBody?.allowsRotation = false
-        airBullet.physicsBody?.isDynamic = false
+        // airBullet.physicsBody?.allowsRotation = false
+        //airBullet.physicsBody?.isDynamic = false
         airBullet.physicsBody?.categoryBitMask = 8
         //        airBullet.physicsBody?.collisionBitMask = 4
         //        airBullet.physicsBody?.contactTestBitMask = 4
@@ -532,6 +802,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             let randomUFOMove = Int.random(in: 0...(ufos.count - 1))
             moveUFO = ufos[randomUFOMove]
+            moveUFO.name = "coming"
+            moveUFO.physicsBody?.categoryBitMask = 2
+            moveUFO.physicsBody?.collisionBitMask = 1
+            moveUFO.physicsBody?.contactTestBitMask = 1
+            UFODown = 0
+            ufocoming.play()
             ufos.remove(at: randomUFOMove)
             pastTime = time
             
@@ -580,74 +856,90 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // print("GAME OVER!")
             objectB.removeFromParent()
             objectA.removeFromParent()
+            playerScore += 100
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
         }
         else if (objectA.name == "ufo" && objectB.name == "bullet") {
             //print("GAME OVER!")
             objectA.removeFromParent()
             objectB.removeFromParent()
+            playerScore += 100
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
+        }
+        if (objectA.name == "bullet" && objectB.name == "coming") {
+            print("DEAD OVER!")
+            objectB.removeFromParent()
+            objectA.removeFromParent()
+            moveUFO.physicsBody = nil
+            playerScore += 200
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
+        }
+        else if (objectA.name == "coming" && objectB.name == "bullet") {
+            print("DEAD OVER!")
+            objectA.removeFromParent()
+            objectB.removeFromParent()
+            moveUFO.physicsBody = nil
+            playerScore += 200
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
         }
         // COLLISION WITH AIRCRAFT
         if (objectA.name == "bullet" && objectB.name == "aircraft") {
             // print("GAME OVER!")
             objectB.removeFromParent()
             objectA.removeFromParent()
+            playerScore += 50
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
         }
         else if (objectA.name == "aircraft" && objectB.name == "bullet") {
             // print("GAME OVER!")
             objectA.removeFromParent()
             objectB.removeFromParent()
+            playerScore += 50
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
+            
         }
         
-        
-        for i in 0...shuttles.count - 1 {
-            // COLLISION WITH SHUTTLE
-            if (objectA.name == "bullet" && objectB.name == "shuttle" + String(i)) {
-                // print("GAME OVER!")
-                print("Count Shuttle b4 == \(shuttles.count)")
-                print("Track Shuttle b4 == \(trackShuttleCount)")
-                objectB.removeFromParent()
-                objectA.removeFromParent()
-                shuttles.remove(at: i)
-                trackShuttleCount -= 1
-                print("Count Shuttle == \(shuttles.count)")
-                print("Track Shuttle == \(trackShuttleCount)")
-            }
-            else if (objectA.name == "shuttle" + String(i) && objectB.name == "bullet") {
-                // print("GAME OVER!")
-                print("Count Shuttle b4 == \(shuttles.count)")
-                print("Track Shuttle b4 == \(trackShuttleCount)")
-                objectA.removeFromParent()
-                objectB.removeFromParent()
-                shuttles.remove(at: i)
-                trackShuttleCount -= 1
-                print("Count Shuttle == \(shuttles.count)")
-                print("Track Shuttle b4 == \(trackShuttleCount)")
-            }
-        }
         // COLLISION WITH SHUTTLE
         if (objectA.name == "bullet" && objectB.name == "shuttle") {
             // print("GAME OVER!")
             objectB.removeFromParent()
             objectA.removeFromParent()
+            playerScore += 20
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
         }
         else if (objectA.name == "shuttle" && objectB.name == "bullet") {
             // print("GAME OVER!")
             objectA.removeFromParent()
             objectB.removeFromParent()
+            playerScore += 20
+            scoreLabel.text = ("\(playerScore)")
+            ufodie.play()
         }
-        // ENEMY BULLET WITH PLAYER
-        if (objectA.name == "airbullet" && objectB.name == "jet") {
-            print("PLAYER DIE")
-            remainingLife -= 1
-            objectB.removeFromParent()
-            objectA.removeFromParent()
-        }
-        else if (objectA.name == "jet" && objectB.name == "airbullet") {
-            print("PLAYER DIE")
-            remainingLife -= 1
-            objectA.removeFromParent()
-            objectB.removeFromParent()
-        }
+        //        // ENEMY BULLET WITH PLAYER
+        //         if (objectA.name == "airbullet" && objectB.name == "jet") {
+        //            print("PLAYER DIE")
+        //          //  objectB.removeFromParent()
+        //          // objectA.removeFromParent()
+        //            //decrease player life
+        //        }
+        //        else if (objectA.name == "jet" && objectB.name == "airbullet") {
+        //            print("PLAYER DIE")
+        //         // objectA.removeFromParent()
+        //       //   objectB.removeFromParent()
+        //
+        //        }
         
         
         //        else if (objectA.name == "cat" && objectB.name == "bed") {
@@ -663,16 +955,81 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // GAME WIN RULES
     }
     
+    //FUNCTION TO REMOVE THE PLAYER FROM SCENE AND DECREASE THE LIVES
+    func decreasePlayerLifeCount(live:Bool){
+        if(decreaseLivescount == true ){
+            //removing from scene
+            remainingLifeNode.last?.removeFromParent()
+            
+            //removing from array
+            self.remainingLifeNode.remove(at: self.remainingLifeNode.count - 1)
+            print(" show \(self.remainingLifeNode.count)")
+            print(" flag before \(decreaseLivescount) ")
+            playerdie.play()
+            player.position = CGPoint(x: 400, y: 100)
+            addChild(self.player)
+            //RESTARTING THE SCENE IF PLAYER LIVES ARE OVER
+            if(remainingLifeNode.count == 0)
+            {
+                //ADD A GAME OVER SCENE
+                let newScene = GameScene(size: self.size)
+                newScene.scaleMode = self.scaleMode
+                let animation = SKTransition.fade(withDuration: 1.0)
+                self.view?.presentScene(newScene, transition: animation)
+            }
+            decreaseLivescount = false;
+            print(" flag after \(decreaseLivescount) ")
+        }
+    }
+    
     
     
     // Variables to set grids and firing aricraft bullet at random time
     var isGridSet = false
     var isGridSetTimer:TimeInterval?
+    
+    var isGridSet2 = false
+    var isGridSetTimer2:TimeInterval?
+    
     var bulletTime:TimeInterval?
     var playerBulletTime:TimeInterval?
+    var ufoCollideTime:TimeInterval?
+    var timeToBomb: TimeInterval?
     
+    var gameTime: TimeInterval?
+    // ---------------------
+    // UPDATE FUNCTION
+    //--------------------
     
     override func update(_ currentTime: TimeInterval) {
+        
+        //CHECKING GAME WIN CONDITION
+        if((self.childNode(withName: "aircraft")) == nil
+            &&
+            (self.childNode(withName: "ufo") == nil)
+            &&
+            (self.childNode(withName: "shuttle") == nil)
+            &&
+            (self.childNode(withName: "aircraft2")) == nil
+            &&
+            (self.childNode(withName: "ufo2") == nil)
+            &&
+            (self.childNode(withName: "shuttle2") == nil))
+        {
+            //ADD THE GAME WON SCENE
+            print("WON")
+            
+            let scene = SKScene(fileNamed: "win")
+            scene!.scaleMode = .aspectFill
+            
+            let flipTransition = SKTransition.flipVertical(withDuration: 2)
+            
+            self.scene?.view?.presentScene(scene!, transition: flipTransition)
+            
+        }
+        if (ufoCollideTime == nil) {
+            ufoCollideTime = currentTime
+        }
         // Called before each frame is rendered
         self.moveBackground()
         
@@ -688,17 +1045,49 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (timePassed >= 2) {
             timeOfLastUpdate = currentTime
             // Make Ufo Appear on screen
-            makeUfoAppear()
+            makeUfoAppear(heightPercent: 0.9)
             // Make airCraft Appear on screen
-            makeAirCraftAppear()
+            makeAirCraftAppear(heightPercent: 0.8)
             // Make Shuttle Appear on screen
-            makeShuttleAppear()
-            
-            
+            makeShuttleAppear(heightPercent: 0.7)
         }
         
+        
+        if (gameTime == nil) {
+            gameTime = currentTime
+        }
+        // print a message every 3 seconds
+        let gameTimePassed = (currentTime - gameTime!)
+        
+        if (gameTimePassed >= 60) {
+            timeOfLastUpdate = currentTime
+            // Make Ufo Appear on screen
+            makeUfoAppear2(heightPercent: 0.85)
+            // Make airCraft Appear on screen
+            makeAirCraftAppear2(heightPercent: 0.75)
+            // Make Shuttle Appear on screen
+            makeShuttleAppear2(heightPercent: 0.65)
+        }
+        
+        
+        if(isShieldActive == true){
+            if(timeForShieldActive == nil){
+                timeForShieldActive = currentTime
+            }
+            
+            let activeShieldTimePassed = (currentTime - timeForShieldActive!)
+            
+            if(activeShieldTimePassed >= 10){
+                self.player.removeAllChildren()
+                isShieldActive = false
+            }
+        } else if (isShieldActive == false) {
+            timeForShieldActive = nil
+        }
+        
+        
         // gird setting flag
-        if(trackUfoCount == 4 && trackAirCraftCount == 6 && trackShuttleCount == 10){
+        if(trackUfoCount == 4 && trackAirCraftCount == 6  && trackShuttleCount == 10){
             if (isGridSetTimer == nil) {
                 isGridSetTimer = currentTime
             }
@@ -722,18 +1111,46 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         }
         
+        
+        // gird setting flag
+        if(trackUfoCount2 == 4 && trackAirCraftCount2 == 6  && trackShuttleCount2 == 10){
+            if (isGridSetTimer2 == nil) {
+                isGridSetTimer2 = currentTime
+            }
+            let gridTimePassed2 = (currentTime - isGridSetTimer2!)
+            if(gridTimePassed2 >= 5) {
+                isGridSet2 = true
+                isGridSetTimer2 = currentTime
+            }
+        }
+        
+        // calling functions to make enemies start moving
+        if(isGridSet2 == true){
+            makeUfoMove2()
+            makeAirCraftMove2()
+            makeShuttleMove2()
+            
+            //calling the enemy move functon
+            enemyTowardsPlayer(time: currentTime)
+            
+        }
+        
         //PLAYER AUTOMATIC BULLET
         if (playerBulletTime == nil) {
             playerBulletTime = currentTime
         }
         let PLbulletTimePassed = (currentTime - playerBulletTime!)
-        if(PLbulletTimePassed >= 2 && isGridSet == true) {
+        if(PLbulletTimePassed >= 1 && isGridSet == true) {
             
             //AUTOMATIC BULLETS
             let playerX = self.player.position.x + (self.player.size.width / 2)
             let playerY = self.player.position.y + (self.player.size.height / 2)
-            
-            makeBullet(xPosition: playerX, yPosition: playerY)
+            //making bullets only if player lives are left
+            if(remainingLifeNode.count != 0){
+                makeBullet(xPosition: playerX, yPosition: playerY)
+                playershoot.play()
+                
+            }
             playerBulletTime = currentTime
         }
         //END PLAYER AUTOMATIC BULLET ------------------
@@ -744,7 +1161,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let bulletTimePassed = (currentTime - bulletTime!)
         if(bulletTimePassed >= 5 && isGridSet == true) {
-            makeAirCraftBullet()
+            //makeAirCraftBullet()
             
             bulletTime = currentTime
         }
@@ -753,23 +1170,71 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if(mousePosition != nil){
             movePlayerOnTap(speed: PLspeed,mousePos: mousePosition!)
         }
+        //Detecting intersection with ufo
         if(moveUFO != nil){
-            if (self.player.intersects(moveUFO) == true) {
-                moveUFO.removeFromParent()
+            
+            // print a message every 3 seconds
+            let collidehapped = (currentTime - ufoCollideTime!)
+            
+            
+            
+            if (self.player.intersects(moveUFO) == true && (moveUFO.physicsBody != nil)){
+                // ufo die
+                if (collidehapped >= 5) {
+                    moveUFO.removeFromParent()
+                    //    moveUFO.physicsBody = nil
+                    //player die
+                    player.removeFromParent()
+                    //live decrease
+                    //UFOCount += 1
+                    decreaseLivescount = true
+                    ufoCollideTime = currentTime
+                }
             }
             
         }
+        
+        //taking count because it collides too many times
+        decreasePlayerLifeCount(live:decreaseLivescount)
+        
+        
+
         
     }
     
     
     var mousePosition:CGPoint?
     
+    func makePlayerShield() {
+        let onPlayerShield = SKSpriteNode(imageNamed: "shield")
+        onPlayerShield.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        onPlayerShield.position = CGPoint(x: (self.player.size.width / 2), y: (self.player.size.height / 2))
+        onPlayerShield.size = CGSize(width: 100, height: 100)
+        onPlayerShield.name = "onPlayerShield"
+       // addChild(onPlayerShield)
+        self.player.addChild(onPlayerShield)
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         mousePosition = touches.first?.location(in: self)
         
         PLspeed = 20
+        
+        
+        // 1. Dectect what sprit was touched
+        let spriteTouched = self.atPoint(mousePosition!)
+        
+        // 2. check if he touched tree
+        if(spriteTouched.name == "shield")
+        {
+            isShieldActive = true
+            makePlayerShield()
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
     }
     
     
