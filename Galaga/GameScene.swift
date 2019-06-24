@@ -333,7 +333,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		self.createBackground()
-		timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
+		
 		// Create player
 		self.player.position = CGPoint(x: 0, y: 100)
 		self.player.anchorPoint = CGPoint(x: 0, y: 0)
@@ -413,6 +413,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		timeLabel.verticalAlignmentMode = .top
 		timeLabel.position = CGPoint(x: self.size.width, y: self.size.height)
 		addChild(timeLabel)
+		
+		timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
 		
 		// add life to screen
 		for i in 0...remainingLife - 1 {
@@ -799,6 +801,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var yd:CGFloat = 0
 	var UFOremoveCount = 0
 	var pastTime:TimeInterval?
+	var isUfoInParent = true
 	func enemyTowardsPlayer(time:TimeInterval){
 		
 		if (pastTime == nil) {
@@ -821,6 +824,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 			
 		}
+		
+		for i in 0...ufos.count-1 {
+			if(ufos[i].parent == nil){
+				isUfoInParent = false
+			} else if (ufos[i].parent != nil){
+				isUfoInParent = true
+			}
+		}
+		
+		for i in 0...ufos2.count-1 {
+			if(ufos2[i].parent == nil){
+				isUfoInParent = false
+			} else if (ufos2[i].parent != nil){
+				isUfoInParent = true
+			}
+		}
+		
+		
 		if(moveUFO != nil){
 			let a = player.position.x - moveUFO.position.x
 			// (y2-y1)
@@ -982,10 +1003,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(remainingLifeNode.count == 0)
 			{
 				//ADD A GAME OVER SCENE
-				let newScene = GameScene(size: self.size)
-				newScene.scaleMode = self.scaleMode
-				let animation = SKTransition.fade(withDuration: 1.0)
-				self.view?.presentScene(newScene, transition: animation)
+				print("Lose1")
+				let scene = SKScene(fileNamed: "lose")
+				scene!.scaleMode = .aspectFill
+				
+				let flipTransition = SKTransition.flipVertical(withDuration: 2)
+				
+				self.scene?.view?.presentScene(scene!, transition: flipTransition)
 			}
 			decreaseLivescount = false;
 			print(" flag after \(decreaseLivescount) ")
@@ -1010,7 +1034,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	
 	var gameTime: TimeInterval?
 	var shieldActivateTime: TimeInterval?
-	
 	var blastTime: TimeInterval?
 	var blastCountDown = 6
 	// ---------------------
@@ -1132,7 +1155,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(gridTimePassed >= 5) {
 				isGridSet = true
 				isGridSetTimer = currentTime
+				
 			}
+			
 		}
 		
 		// calling functions to make enemies start moving
@@ -1142,7 +1167,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			makeShuttleMove()
 			moveBullet()
 			moveAirCraftBullet()
-			
+			timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
 			//calling the enemy move functon
 			enemyTowardsPlayer(time: currentTime)
 			
@@ -1172,7 +1197,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			
 		}
 		
-		//PLAYER AUTOMATIC BULLET
+		/*//PLAYER AUTOMATIC BULLET
 		if (playerBulletTime == nil) {
 			playerBulletTime = currentTime
 		}
@@ -1191,7 +1216,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			playerBulletTime = currentTime
 		}
 		//END PLAYER AUTOMATIC BULLET ------------------
-		
+		*/
 		if (bulletTime == nil) {
 			bulletTime = currentTime
 		}
@@ -1238,7 +1263,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			onDeploy = currentTime
 		}
 		let beforeDeployTime = (currentTime - onDeploy!)
-		if(beforeDeployTime >= 10) {
+		if(beforeDeployTime >= 70) {
 			canDeployerBomb = true
 			onDeploy = nil
 			print("Can Deploy Bomb")
@@ -1265,8 +1290,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 							if(i%2 == 0){
 								if(ufos[i].parent != nil){
 									ufos[i].removeFromParent()
-									ufos.remove(at: i)
-									trackUfoCount -= 1
+									//ufos.remove(at: i)
+									//trackUfoCount -= 1
 								}
 							}
 							ufocnt -= 1
@@ -1277,8 +1302,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 								if(i%2 == 0){
 									if(ufos[i].parent != nil){
 										ufos[i].removeFromParent()
-										ufos.remove(at: i)
-										trackUfoCount -= 1
+										//ufos.remove(at: i)
+										//trackUfoCount -= 1
 									}
 								}
 								ufocnt -= 1
@@ -1288,8 +1313,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 									if(i%2 == 0){
 										if(ufos2[i].parent != nil){
 											ufos2[i].removeFromParent()
-											ufos2.remove(at: i)
-											trackUfoCount2 -= 1
+//ufos2.remove(at: i)
+											///trackUfoCount2 -= 1
 										}
 									}
 									ufocnt -= 1
@@ -1303,8 +1328,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 								if(i%2 == 0){
 									if(aircrafts[i].parent != nil){
 										aircrafts[i].removeFromParent()
-										aircrafts.remove(at: i)
-										trackAirCraftCount -= 1
+										//aircrafts.remove(at: i)
+										//trackAirCraftCount -= 1
 									}
 								}
 								aircnt -= 1
@@ -1315,8 +1340,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 									if(i%2 == 0){
 										if(aircrafts[i].parent != nil){
 											aircrafts[i].removeFromParent()
-											aircrafts.remove(at: i)
-											trackAirCraftCount -= 1
+											//aircrafts.remove(at: i)
+											//trackAirCraftCount -= 1
 										}
 									}
 									aircnt -= 1
@@ -1326,8 +1351,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 									if(i%2 == 0){
 										if(aircrafts2[i].parent != nil){
 											aircrafts2[i].removeFromParent()
-											aircrafts2.remove(at: i)
-											trackAirCraftCount2 -= 1
+											//aircrafts2.remove(at: i)
+											//trackAirCraftCount2 -= 1
 										}
 									}
 									aircnt -= 1
@@ -1341,8 +1366,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 								if(i%2 == 0){
 									if(shuttles[i].parent != nil){
 										shuttles[i].removeFromParent()
-										shuttles.remove(at: i)
-										trackShuttleCount -= 1
+										//shuttles.remove(at: i)
+										//trackShuttleCount -= 1
 									}
 								}
 								shuttlecnt -= 1
@@ -1353,8 +1378,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 									if(i%2 == 0){
 										if(shuttles[i].parent != nil){
 											shuttles[i].removeFromParent()
-											shuttles.remove(at: i)
-											trackShuttleCount -= 1
+											//shuttles.remove(at: i)
+											//trackShuttleCount -= 1
 										}
 									}
 									shuttlecnt -= 1
@@ -1364,8 +1389,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 									if(i%2 == 0){
 										if(shuttles2[i].parent != nil){
 											shuttles2[i].removeFromParent()
-											shuttles2.remove(at: i)
-											trackShuttleCount2 -= 1
+											//shuttles2.remove(at: i)
+											//trackShuttleCount2 -= 1
 										}
 									}
 									shuttlecnt -= 1
@@ -1378,8 +1403,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		
+		if(remainingLife == 0){
+			print("Lose2")
+			let scene = SKScene(fileNamed: "lose")
+			scene!.scaleMode = .aspectFill
+			
+			let flipTransition = SKTransition.flipVertical(withDuration: 2)
+			
+			self.scene?.view?.presentScene(scene!, transition: flipTransition)
+		}
+		
 		if(timeLeft <= 0){
-			print("Lose")
+			print("Lose2")
 			var ufore = 0
 			var aircraftre = 0
 			var shuttlere = 0
@@ -1421,7 +1456,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			}
 			
 			if (ufore > 0 ||  aircraftre > 0 || shuttlere > 0) {
-				print ("you lose")
+				print ("you lose123")
 			let scene = SKScene(fileNamed: "lose")
 			scene!.scaleMode = .aspectFill
 			
@@ -1454,7 +1489,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		onPlayerShield.name = "onPlayerShield"
 		onPlayerShield.physicsBody = SKPhysicsBody(circleOfRadius: onPlayerShield.size.width / 2)
 		onPlayerShield.physicsBody?.affectedByGravity = false
-		onPlayerShield.physicsBody?.isDynamic = false
+		onPlayerShield.physicsBody?.isDynamic = true
 		onPlayerShield.physicsBody?.allowsRotation = false
 		onPlayerShield.physicsBody?.contactTestBitMask = 0
 		onPlayerShield.physicsBody?.collisionBitMask = 0
@@ -1468,7 +1503,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		//PLspeed = 20
 		
-		var center = self.size.width / 2
+		let center = self.size.width / 2
 		if(mousePosition!.x < center) {
 			// MOve Left
 			if(self.player.position.x >= 0) {
@@ -1518,10 +1553,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	// deploying the MDW
 	func moveBombToTop() {
 		// Action Sequencing
+		if(bombcnt < 1){
 		let m2 = SKAction.move(to: CGPoint(x: (self.size.width / 2), y: self.size.height * 0.95), duration: 2)
 		let sequence:SKAction = SKAction.sequence([m2])
 		isdeployed = true
 		deployBomb!.run(sequence)
+		} else {
+			deployBomb?.removeFromParent()
+		}
 	}
 	
 	// counters for remaining sprites on the screen
@@ -1531,10 +1570,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var isdeployed = false
 	
 	// randomly pick either of the enemy to kill with MDW
+	var bombcnt = 0
 	var randomEnemy: Int?
 	override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 		if(isTouchMOved == true){
-			if(canDeployerBomb == true){
+			if(canDeployerBomb == true && bombcnt < 1){
 				
 				// randomm number generator
 				randomEnemy = Int.random(in: 0...2)
@@ -1588,6 +1628,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 					}
 					print("Shuttle cnt = \(shuttlecnt)")
 				}
+				bombcnt += 1
 				canDeployerBomb = false
 			}
 		}
