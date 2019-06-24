@@ -333,7 +333,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		self.physicsWorld.contactDelegate = self
 		self.createBackground()
-		
+		timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
 		// Create player
 		self.player.position = CGPoint(x: 0, y: 100)
 		self.player.anchorPoint = CGPoint(x: 0, y: 0)
@@ -413,8 +413,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		timeLabel.verticalAlignmentMode = .top
 		timeLabel.position = CGPoint(x: self.size.width, y: self.size.height)
 		addChild(timeLabel)
-		
-		timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
 		
 		// add life to screen
 		for i in 0...remainingLife - 1 {
@@ -1003,7 +1001,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(remainingLifeNode.count == 0)
 			{
 				//ADD A GAME OVER SCENE
-				print("Lose1")
 				let scene = SKScene(fileNamed: "lose")
 				scene!.scaleMode = .aspectFill
 				
@@ -1155,9 +1152,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(gridTimePassed >= 5) {
 				isGridSet = true
 				isGridSetTimer = currentTime
-				
 			}
-			
 		}
 		
 		// calling functions to make enemies start moving
@@ -1167,7 +1162,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			makeShuttleMove()
 			moveBullet()
 			moveAirCraftBullet()
-			timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
+			
 			//calling the enemy move functon
 			enemyTowardsPlayer(time: currentTime)
 			
@@ -1404,7 +1399,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		
 		if(remainingLife == 0){
-			print("Lose2")
+			print("Lose")
 			let scene = SKScene(fileNamed: "lose")
 			scene!.scaleMode = .aspectFill
 			
@@ -1414,7 +1409,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		if(timeLeft <= 0){
-			print("Lose2")
+			print("Lose")
 			var ufore = 0
 			var aircraftre = 0
 			var shuttlere = 0
@@ -1456,7 +1451,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			}
 			
 			if (ufore > 0 ||  aircraftre > 0 || shuttlere > 0) {
-				print ("you lose123")
+				print ("you lose")
 			let scene = SKScene(fileNamed: "lose")
 			scene!.scaleMode = .aspectFill
 			
