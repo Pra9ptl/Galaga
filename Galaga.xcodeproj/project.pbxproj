@@ -13,6 +13,8 @@
 		45AE107422C03D9A000D6695 /* playerdie.wav in Resources */ = {isa = PBXBuildFile; fileRef = 45AE107022C03D9A000D6695 /* playerdie.wav */; };
 		45AE107822C074D4000D6695 /* win.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45AE107722C074D4000D6695 /* win.sks */; };
 		45AE107A22C07625000D6695 /* lose.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45AE107922C07625000D6695 /* lose.sks */; };
+		45AE107C22C0D81F000D6695 /* win.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AE107B22C0D81F000D6695 /* win.swift */; };
+		45AE107E22C0D82A000D6695 /* lose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45AE107D22C0D82A000D6695 /* lose.swift */; };
 		45B5D39022BA6126007E2F73 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B5D38F22BA6126007E2F73 /* AppDelegate.swift */; };
 		45B5D39222BA6126007E2F73 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45B5D39122BA6126007E2F73 /* GameScene.sks */; };
 		45B5D39422BA6126007E2F73 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 45B5D39322BA6126007E2F73 /* Actions.sks */; };
@@ -49,6 +51,8 @@
 		45AE107022C03D9A000D6695 /* playerdie.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = playerdie.wav; sourceTree = "<group>"; };
 		45AE107722C074D4000D6695 /* win.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = win.sks; sourceTree = "<group>"; };
 		45AE107922C07625000D6695 /* lose.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = lose.sks; sourceTree = "<group>"; };
+		45AE107B22C0D81F000D6695 /* win.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = win.swift; sourceTree = "<group>"; };
+		45AE107D22C0D82A000D6695 /* lose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lose.swift; sourceTree = "<group>"; };
 		45B5D38C22BA6126007E2F73 /* Galaga.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Galaga.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B5D38F22BA6126007E2F73 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		45B5D39122BA6126007E2F73 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -130,6 +134,8 @@
 				45B5D3A122BA612A007E2F73 /* Info.plist */,
 				45AE107722C074D4000D6695 /* win.sks */,
 				45AE107922C07625000D6695 /* lose.sks */,
+				45AE107B22C0D81F000D6695 /* win.swift */,
+				45AE107D22C0D82A000D6695 /* lose.swift */,
 			);
 			path = Galaga;
 			sourceTree = "<group>";
@@ -293,6 +299,8 @@
 			files = (
 				45B5D39622BA6126007E2F73 /* GameScene.swift in Sources */,
 				45B5D39822BA6126007E2F73 /* GameViewController.swift in Sources */,
+				45AE107E22C0D82A000D6695 /* lose.swift in Sources */,
+				45AE107C22C0D81F000D6695 /* win.swift in Sources */,
 				45B5D39022BA6126007E2F73 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
