@@ -31,6 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	var playerdie:AVAudioPlayer!
 	var ufocoming:AVAudioPlayer!
 	var ufodie:AVAudioPlayer!
+	var bgmusic:AVAudioPlayer!
 	var remainingLifeNode:[SKSpriteNode] = []
 	var decreaseLivescount:Bool = false;
 	var timeLeft = 119
@@ -268,8 +269,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 	func moveBackground(){
 		
 		// speed of image movement is 20
-		background.position = CGPoint(x: 0, y: background.position.y - 20)
-		background2.position = CGPoint(x: 0, y: background2.position.y - 20)
+		background.position = CGPoint(x: 0, y: background.position.y - 10)
+		background2.position = CGPoint(x: 0, y: background2.position.y - 10)
 		
 		// resetting background 1 position to top
 		if(background.position.y < -(background.size.height)){
@@ -311,6 +312,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		let ul2 = Bundle.main.url(forResource: "playerdie", withExtension: "wav")
 		let ul3 = Bundle.main.url(forResource: "ufocoming", withExtension: "wav")
 		let ul4 = Bundle.main.url(forResource: "ufodie", withExtension: "wav")
+		let ul5 = Bundle.main.url(forResource: "stars", withExtension: "mp3")
 		do{
 			playershoot =
 				try AVAudioPlayer(contentsOf: ul1!)
@@ -320,17 +322,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 				try AVAudioPlayer(contentsOf: ul3!)
 			ufodie =
 				try  AVAudioPlayer(contentsOf: ul4!)
+			bgmusic =
+				try AVAudioPlayer(contentsOf: ul5!)
 			playershoot.prepareToPlay()
 			playerdie.prepareToPlay()
 			ufocoming.prepareToPlay()
 			ufodie.prepareToPlay()
+			bgmusic.prepareToPlay()
 		}
 		catch{
 			print("error")
 		}
 		///-END SOUNDS
 		
-		
+		bgmusic.play()
 		self.physicsWorld.contactDelegate = self
 		self.createBackground()
 		timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(GameScene.updateTime), userInfo: nil, repeats: true)
@@ -1001,12 +1006,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			if(remainingLifeNode.count == 0)
 			{
 				//ADD A GAME OVER SCENE
-				let scene = SKScene(fileNamed: "lose")
-				scene!.scaleMode = .aspectFill
-				
-				let flipTransition = SKTransition.flipVertical(withDuration: 2)
-				
-				self.scene?.view?.presentScene(scene!, transition: flipTransition)
+				let newScene = GameScene(size: self.size)
+				newScene.scaleMode = self.scaleMode
+				let animation = SKTransition.fade(withDuration: 1.0)
+				self.view?.presentScene(newScene, transition: animation)
 			}
 			decreaseLivescount = false;
 			print(" flag after \(decreaseLivescount) ")
@@ -1258,7 +1261,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			onDeploy = currentTime
 		}
 		let beforeDeployTime = (currentTime - onDeploy!)
-		if(beforeDeployTime >= 70) {
+		if(beforeDeployTime >= 35) {
 			canDeployerBomb = true
 			onDeploy = nil
 			print("Can Deploy Bomb")
@@ -1399,7 +1402,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		
 		
 		if(remainingLife == 0){
-			print("Lose")
+			print("Lose1")
 			let scene = SKScene(fileNamed: "lose")
 			scene!.scaleMode = .aspectFill
 			
@@ -1409,7 +1412,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		}
 		
 		if(timeLeft <= 0){
-			print("Lose")
+			print("Lose2")
 			var ufore = 0
 			var aircraftre = 0
 			var shuttlere = 0
@@ -1451,7 +1454,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 			}
 			
 			if (ufore > 0 ||  aircraftre > 0 || shuttlere > 0) {
-				print ("you lose")
+				print ("you lose1234")
 			let scene = SKScene(fileNamed: "lose")
 			scene!.scaleMode = .aspectFill
 			
@@ -1484,7 +1487,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 		onPlayerShield.name = "onPlayerShield"
 		onPlayerShield.physicsBody = SKPhysicsBody(circleOfRadius: onPlayerShield.size.width / 2)
 		onPlayerShield.physicsBody?.affectedByGravity = false
-		onPlayerShield.physicsBody?.isDynamic = true
+		onPlayerShield.physicsBody?.isDynamic = false
 		onPlayerShield.physicsBody?.allowsRotation = false
 		onPlayerShield.physicsBody?.contactTestBitMask = 0
 		onPlayerShield.physicsBody?.collisionBitMask = 0
